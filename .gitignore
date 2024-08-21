@@ -18,6 +18,12 @@ target/
 ### Mac OS ###
 .DS_Store
 
+### Local ###
+local/*
+!local/composefile.yaml
+!local/mnt/init/*
+!local/mnt/release-tracker/.gitkeep
+!local/mnt/secret/db_jdbc_password.txt
+
 ### Other ###
 .idea/git_toolbox_*
-

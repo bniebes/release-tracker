@@ -1,0 +1,33 @@
+name: "release-tracker-local"
+
+services:
+  ### PostgreSQL Database ##############################################################################################
+  psql:
+    image: "postgres:16.3-bookworm"
+    restart: no
+    environment:
+      POSTGRES_USER: "psd-batch"
+      POSTGRES_PASSWORD_FILE: "/run/secrets/db_jdbc_password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - "./mnt/postgres:/var/lib/postgresql/data"
+      - "./mnt/init/db_init.sql:/docker-entrypoint-initdb.d/db_init.sql"
+    secrets:
+      - db_jdbc_password
+    ports:
+      - "5432:5432"
+
+  ### Release Tracker Application ######################################################################################
+  release-tracker:
+    build:
+      context: ".."
+      dockerfile: "Containerfile"
+    restart: no
+    volumes:
+      - "./mnt/release-tracker:/opt/release-tracker/data"
+    secrets:
+      - db_jdbc_password
+
+secrets:
+  db_jdbc_password:
+    file: "./mnt/secret/db_jdbc_password.txt" # This is a local development only password
