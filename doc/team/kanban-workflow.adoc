@@ -1,0 +1,55 @@
+= Kanban Workflow
+Brian Niebes <brian.niebes@iu-study.org>
+v1: Initial Workflow
+:sectnums:
+
+NOTE: The actual Kanban board is in german.
+
+== Workflow
+
+[%autowidth.stretch]
+|===
+|Column |Next |Note
+
+|Templates |- |
+|Backlog |Ready, Rejected, Active |
+|Rejected |- |
+|Ready |Active |
+|Active |Done |WIP Limit: 2
+|Done |- |
+|===
+
+== Description
+
+=== Templates
+
+Template cards. There are currently 4 template cards for the most used types of cards:
+
+* Development
+** Software development task
+* Task
+** Non Software development task
+* Analysis
+* Bug Fix
+** Special Kind of SW Task to emphasize the importance of bug fixes
+** Combination of Analysis and Software Development
+
+=== Backlog
+
+Initial place for cards. Every card is created here and will be evaluated before going further in the workflow.
+
+=== Rejected
+
+Cards which were created in the backlog but shouldn't be worked on.
+
+=== Ready
+
+Cards which can be worked on next.
+
+=== Active
+
+Cards where work is ongoing.
+
+=== Done
+
+Cards where the work was completed.
