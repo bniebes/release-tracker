@@ -1,0 +1,47 @@
+= Draft - Data Model
+Brian Niebes <brian.niebes@iu-study.org>
+v1: Initial Draft
+:sectnums:
+
+== Data
+
+[%autowidth.stretch]
+|===
+|Name |Required |Description |Examples
+
+|Application Name |Yes |Name of the application |Release Tracker
+|Environment |Yes |Environment of the release |Dev, Test, Stage, Prod
+|Version |Yes |Version of the release |1.0.1, 2024-1
+|Timestamp |Yes |Release time, implicit now. ISO 8601|2024-08-21T08:34:00.000+02:00
+|Release Name |No |Name of the release |Bionic Beaver, Sonoma
+|Description |No |Release description |
+|Change list |No |Changes contained in the release |
+|Responsible Person |No |Person/Team in charge of the release |Team XYZ
+|Build Location |No |Build Source of the release |GitHub, GitLab, In-House Tool
+|Sequence Number |Yes |Internal Release Number |1,2,...
+|===
+
+== In depth
+
+=== Precedence
+
+A release with a later timestamp will override the previous release for the specific environment. This means that only one release can be active per environment.
+
+Release rollbacks can be marked in the description.
+
+=== Uniqueness
+
+A release entry is unique by the following values:
+
+* Application Name
+* Environment
+* Version
+* Timestamp
+
+The timestamp ensures, that the same version of the application can be deployed to the same environment. This could be necessary if a release was rolled back and the wanting to release the previously rolled back version again.
+
+If in entry is added with the same Name, Environment, Version and Timestamp, the entry will be updated.
+
+=== Deletion
+
+Release information is not meant to be deleted. A value which might be needed to be deleted is the responsible person to adhere to data protection law. It has to be ensured that this field can be deleted if necessary.
