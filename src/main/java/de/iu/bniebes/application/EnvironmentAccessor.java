@@ -1,5 +1,8 @@
 package de.iu.bniebes.application;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -52,6 +55,16 @@ public class EnvironmentAccessor {
             return Long.parseLong(entry);
         } catch (NumberFormatException nfEx) {
             throw new IllegalStateException("Can not convert %s to long".formatted(entry), nfEx);
+        }
+    }
+
+    public String loadSecret(final String pathEnvKey, final String defaultPath)
+            throws IllegalArgumentException, IllegalStateException {
+        final var path = Path.of(getOrDefault(pathEnvKey, defaultPath));
+        try {
+            return Files.readString(path).strip();
+        } catch (IOException ioEx) {
+            throw new IllegalStateException("Could not read secret at [%s]".formatted(path), ioEx);
         }
     }
 }
