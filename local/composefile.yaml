@@ -2,7 +2,7 @@ name: "release-tracker-local"
 
 services:
   ### PostgreSQL Database ##############################################################################################
-  psql:
+  pgsql:
     image: "postgres:16.3-bookworm"
     restart: no
     environment:
