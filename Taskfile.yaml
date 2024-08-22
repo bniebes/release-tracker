@@ -1,0 +1,13 @@
+version: '3'
+
+# Release Tracker - Taskfile
+# To run the task the following applications have to be installed locally:
+# taskfile, docker, docker compose, maven
+
+includes:
+  local: "./local"
+
+tasks:
+  default:
+    desc: List all tasks
+    cmd: "task --list-all --sort none"

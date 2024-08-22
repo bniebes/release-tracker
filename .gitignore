@@ -20,7 +20,9 @@ target/
 
 ### Local ###
 local/*
+!local/Taskfile.yaml
 !local/composefile.yaml
+!local/_tools
 !local/mnt/init/*
 !local/mnt/release-tracker/.gitkeep
 !local/mnt/secret/db_jdbc_password.txt

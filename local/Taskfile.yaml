@@ -1,0 +1,94 @@
+version: '3'
+
+vars:
+  # Directories
+  DIR_MNT: "{{.TASKFILE_DIR}}/mnt"
+  DIR_RELEASE_TRACKER: "{{.DIR_MNT}}/release-tracker"
+  DIR_LOG: "{{.DIR_RELEASE_TRACKER}}/log"
+  DIR_POSTGRES: "{{.DIR_MNT}}/postgres"
+  # Labels
+  DEBIAN: "debian:stable-slim"
+  # Commands
+  RUN: "docker run --rm -it"
+  COMPOSE: "docker compose -f {{.TASKFILE_DIR}}/composefile.yaml"
+
+tasks:
+
+  # Clean ##############################################################################################################
+
+  clean:log:
+    desc: Delete local log files
+    cmd: "{{.RUN}} -v {{.DIR_RELEASE_TRACKER}}:/wrk -w /wrk {{.DEBIAN}} /bin/bash -c  \"rm -rf log;mkdir log\""
+
+  clean:pgsql:
+    desc: Delete local postgres data
+    cmd: "{{.RUN}} -v {{.DIR_POSTGRES}}:/wrk -w /wrk {{.DEBIAN}} rm -rf pgdata"
+
+  clean:all:
+    desc: Run all clean tasks
+    cmds:
+      - task: clean:log
+      - task: clean:pgsql
+
+  # Compose ############################################################################################################
+
+  compose:up:
+    aliases: ["up"]
+    desc: Start docker compose
+    cmd: "{{.COMPOSE}} up -d --build"
+
+  compose:up:pgsql:
+    desc: Start docker compose service pgsql
+    cmd: "{{.COMPOSE}} up -d pgsql"
+
+  compose:down:
+    aliases: ["down"]
+    desc: Stop docker compose
+    cmd: "{{.COMPOSE}} down --remove-orphans"
+
+  # Maven ##############################################################################################################
+
+  mvn:clean:
+    desc: Maven clean
+    cmd: "mvn clean"
+
+  mvn:clean:package:
+    desc: Maven clean package
+    cmd: "mvn clean package"
+
+  mvn:clean:test:
+    desc: Maven run tests
+    cmd: "mvn clean test"
+
+  mvn:clean:test:db:
+    desc: Maven run tests
+    cmd: "mvn clean test -Dtest.condition.pgsql=true"
+
+  # Dev ################################################################################################################
+
+  dev:test:integration:
+    desc: Run integration tests
+    cmds:
+      - task: compose:down
+      - task: clean:pgsql
+      - task: compose:up:pgsql
+      - task: mvn:clean:test:db
+      - task: compose:down
+
+  dev:reload:
+    desc: Reload changes
+    summary: Rebuild application with maven and restart docker services via docker compose
+    aliases: ["reload", "start"]
+    cmds:
+      - task: mvn:clean:package
+      - task: compose:up
+
+  dev:reset:
+    desc: Reset local dev environment
+    summary: Stop running containers, reset postgresql, rebuild and start the application
+    aliases: ["reset"]
+    cmds:
+      - task: compose:down
+      - task: clean:pgsql
+      - task: mvn:clean:package
+      - task: compose:up
