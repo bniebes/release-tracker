@@ -2,7 +2,7 @@ package de.iu.bniebes.application;
 
 import static de.iu.bniebes.constant.GlobalConstants.*;
 
-import de.iu.bniebes.service.external.DBClientService;
+import de.iu.bniebes.service.external.db.DBClientService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

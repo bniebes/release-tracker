@@ -1,4 +1,4 @@
-package de.iu.bniebes.service.external;
+package de.iu.bniebes.service.external.db;
 
 import com.zaxxer.hikari.HikariDataSource;
 import de.iu.bniebes.configuration.DBConfiguration;
