@@ -4,7 +4,7 @@
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/opt/release-tracker/data/log/psd-batch.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>/opt/release-tracker/data/log/release-tracker_%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>14</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
