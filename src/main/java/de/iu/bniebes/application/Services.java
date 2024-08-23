@@ -4,18 +4,21 @@ import static de.iu.bniebes.constant.GlobalConstants.*;
 
 import de.iu.bniebes.service.external.db.DBClientService;
 import de.iu.bniebes.service.external.db.DBService;
+import de.iu.bniebes.service.internal.InputSanitizationService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Services implements AutoCloseable {
 
     public final DBClientService dbClientService;
+    public final DBService dbService;
+    public final InputSanitizationService inputSanitizationService;
 
     public Services(final Configuration configuration) {
         log.atInfo().addMarker(Markers.APPLICATION).setMessage("Set-Up").log();
         this.dbClientService = new DBClientService(configuration.dbConfiguration);
-
-        final var dbService = new DBService(dbClientService);
+        this.dbService = new DBService(dbClientService);
+        this.inputSanitizationService = new InputSanitizationService();
     }
 
     @Override
