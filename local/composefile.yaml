@@ -28,6 +28,8 @@ services:
       - "./mnt/release-tracker:/opt/release-tracker/data"
     secrets:
       - db_jdbc_password
+    ports:
+      - "30123:30123"
 
 secrets:
   db_jdbc_password:

@@ -1,6 +1,6 @@
 = Draft - API Endpoints
 Brian Niebes <brian.niebes@iu-study.org>
-v1: Initial Draft
+v2: Adjust health endpoint
 :sectnums:
 
 == Endpoints
@@ -14,7 +14,7 @@ NOTE: Base URL: /
 |Name |Sub Path |Description
 
 |Root |- |Root path, respond with basic text
-|Health |/v1/health |200 OK if application is running and responding
+|Health |/health |200 OK if application is running and responding
 |===
 
 === Release
