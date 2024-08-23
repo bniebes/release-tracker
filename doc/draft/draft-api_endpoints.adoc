@@ -1,0 +1,39 @@
+= Draft - API Endpoints
+Brian Niebes <brian.niebes@iu-study.org>
+v1: Initial Draft
+:sectnums:
+
+== Endpoints
+
+=== Base
+
+NOTE: Base URL: /
+
+[%autowidth.stretch]
+|===
+|Name |Sub Path |Description
+
+|Root |- |Root path, respond with basic text
+|Health |/v1/health |200 OK if application is running and responding
+|===
+
+=== Release
+
+NOTE: Base URL: /v1/release
+
+[%autowidth.stretch]
+|===
+|Name |Method |Sub Path |Description
+
+|Create |POST |/<app>/<env>/<ver> |Create a new release, implicit now
+|Create or Update |PUT |/<app>/<env>/<ver>/<rts> |Create a new release or update if it already exists
+|Get |GET |/<app>/<env>/<ver>/<rts> |Get a specific release
+|All |GET |/ |Get all releases
+|All by App |GET |/<app> |Get all releases of the application
+|All by App,Env |GET |/<app>/<env> |Get all releases of the application and environment
+|===
+
+[NOTE]
+--
+Optional Information can optionally be attached as Json body on the create and create or update endpoints
+--
