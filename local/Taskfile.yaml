@@ -66,6 +66,11 @@ tasks:
     desc: Maven run tests
     cmd: "mvn clean test -Dtest.condition.pgsql=true"
 
+  mvn:spotless:apply:
+    desc: Run the Spotless Maven plugin
+    aliases: ["fmt"]
+    cmd: "mvn spotless:apply"
+
   # Dev ################################################################################################################
 
   dev:test:integration:
