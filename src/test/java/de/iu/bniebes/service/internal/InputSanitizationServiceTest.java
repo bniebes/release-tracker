@@ -2,11 +2,10 @@ package de.iu.bniebes.service.internal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 class InputSanitizationServiceTest {
 
@@ -75,9 +74,10 @@ class InputSanitizationServiceTest {
 
         @Test
         void safeText_AllAllowedCharacters() {
-            final var validText = """
+            final var validText =
+                    """
                     This is a test text!
-                    
+
                     The following characters should be allowed: |.:,;!?$%#+*/()-\\
                     A tab \t should also be allowed
                     """;
@@ -88,9 +88,10 @@ class InputSanitizationServiceTest {
 
         @Test
         void safeText_InvalidCharacters() {
-            final var invalidText = """
+            final var invalidText =
+                    """
                     This is a test text!
-                    
+
                     The following characters should be allowed: |.:,;!?$%#+*/()-\\
                     A tab \t should also be allowed
                     Curly Braces are not allowed {}
@@ -105,7 +106,8 @@ class InputSanitizationServiceTest {
         @Test
         void offsetDateTime() {
             final var offsetBerlin = ZoneOffset.of("+02:00");
-            final var time = OffsetDateTime.of(2024, 8, 23, 16, 52, 0, 0, offsetBerlin).toInstant();
+            final var time =
+                    OffsetDateTime.of(2024, 8, 23, 16, 52, 0, 0, offsetBerlin).toInstant();
 
             final var resultFull = inputSanitizationService.offsetDateTime("2024-08-23T16:52:00.000+02:00");
             assertTrue(resultFull.isPresent());
