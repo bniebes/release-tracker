@@ -36,8 +36,8 @@ public class ReleaseHttpServiceV1 implements HttpService {
                 return;
             }
 
-            final var maybeTimestamp = releaseCreationService.create(maybeApp.get(), maybeEnv.get(), maybeVer.get());
-            if (maybeTimestamp.isEmpty()) {
+            final var maybeCreateResult = releaseCreationService.create(maybeApp.get(), maybeEnv.get(), maybeVer.get());
+            if (maybeCreateResult.isEmpty()) {
                 log.atError()
                         .addMarker(GlobalConstants.Markers.HTTP)
                         .setMessage("Could not create a release")
@@ -46,7 +46,7 @@ public class ReleaseHttpServiceV1 implements HttpService {
                 return;
             }
 
-            response.status(Status.CREATED_201).send(maybeTimestamp.get());
+            response.status(Status.CREATED_201).send(maybeCreateResult.get());
         } catch (NoSuchElementException nseEx) {
             onNoSuchElementException(nseEx, response);
         }
