@@ -1,6 +1,5 @@
 package de.iu.bniebes.constant;
 
-import java.math.BigInteger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -16,9 +15,5 @@ public class GlobalConstants {
 
     public static class Directories {
         public static final String SECRET = "/run/secrets";
-    }
-
-    public static class Conversion {
-        public static final BigInteger SECONDS_TO_NANOS_MULTIPLIER = BigInteger.valueOf(1_000_000_000L);
     }
 }

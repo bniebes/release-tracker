@@ -3,7 +3,7 @@ package de.iu.bniebes.service.internal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iu.bniebes.constant.GlobalConstants;
-import de.iu.bniebes.model.result.ReleaseCreateResult;
+import de.iu.bniebes.model.response.ReleaseCreateResponse;
 import de.iu.bniebes.model.result.Result;
 import de.iu.bniebes.service.external.db.ReleaseDBService;
 import java.time.DateTimeException;
@@ -25,7 +25,7 @@ public class ReleaseCreationService {
             final var maybeId = releaseDBService.insert(app, env, version, timestamp);
             if (maybeId.notPresent()) return Result.error();
 
-            return Result.of(mapper.writeValueAsString(ReleaseCreateResult.of(app, env, version, timestamp)));
+            return Result.of(mapper.writeValueAsString(ReleaseCreateResponse.of(app, env, version, timestamp)));
         } catch (DateTimeException | JsonProcessingException ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.SERVICE)
