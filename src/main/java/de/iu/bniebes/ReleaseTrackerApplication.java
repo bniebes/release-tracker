@@ -19,6 +19,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
 
     public ReleaseTrackerApplication() {
         final var configuration = new Configuration(EnvironmentAccessor.getEnvFromSystem());
+        this.port = configuration.webServerConfiguration.port();
         this.services = new Services(configuration);
         this.port = configuration.webServerConfiguration.port();
     }
@@ -29,6 +30,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
                 .port(port)
                 .routing(routing -> routing.get("/", (req, res) -> res.send("Release Tracker"))
                         .get((req, res) -> res.send("OK")))
+                        .get("/health", (req, res) -> res.send("OK"))
                 .build()
                 .start();
         shutdownLatch.await();
