@@ -40,7 +40,7 @@ class ReleaseCreationServiceTest {
         @Test
         void create_insertFailure() {
             when(releaseDBService.insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
-                    .thenReturn(Result.ofError());
+                    .thenReturn(Result.error());
 
             final var result = releaseCreationService.create(TEST_APP, TEST_ENV, TEST_VER);
             verify(releaseDBService, times(1)).insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any());

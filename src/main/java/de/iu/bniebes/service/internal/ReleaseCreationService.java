@@ -23,7 +23,7 @@ public class ReleaseCreationService {
         try {
             final var timestamp = Instant.now();
             final var maybeId = releaseDBService.insert(app, env, version, timestamp);
-            if (maybeId.notPresent()) return Result.ofError();
+            if (maybeId.notPresent()) return Result.error();
 
             return Result.of(mapper.writeValueAsString(ReleaseCreateResult.of(app, env, version, timestamp)));
         } catch (DateTimeException | JsonProcessingException ex) {
@@ -31,7 +31,7 @@ public class ReleaseCreationService {
                     .addMarker(GlobalConstants.Markers.SERVICE)
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 }

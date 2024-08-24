@@ -35,14 +35,14 @@ public class ReleaseDBService {
                     .map(this::toRelease)
                     .findOne()
                     .map(Result::of)
-                    .orElseGet(Result::ofEmpty);
+                    .orElseGet(Result::empty);
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not query a release")
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 
@@ -53,7 +53,7 @@ public class ReleaseDBService {
                     .map(this::toRelease)
                     .findOne()
                     .map(Result::of)
-                    .orElse(Result.ofEmpty());
+                    .orElse(Result.empty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -61,7 +61,7 @@ public class ReleaseDBService {
                     .addArgument(id)
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 
@@ -79,7 +79,7 @@ public class ReleaseDBService {
                     .map((rs, ctx) -> rs.getBigDecimal("id").toBigInteger())
                     .findOne()
                     .map(Result::of)
-                    .orElse(Result.ofEmpty());
+                    .orElse(Result.empty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -90,7 +90,7 @@ public class ReleaseDBService {
                     .addArgument(releaseTimestamp)
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 
@@ -108,7 +108,7 @@ public class ReleaseDBService {
                     .bind("ver", version)
                     .map(this::toRelease)
                     .collectIntoSet();
-            return result.isEmpty() ? Result.ofEmpty() : Result.of(result);
+            return result.isEmpty() ? Result.empty() : Result.of(result);
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -118,7 +118,7 @@ public class ReleaseDBService {
                     .addArgument(version)
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 
@@ -136,14 +136,14 @@ public class ReleaseDBService {
                     .map((rs, ctx) -> rs.getBigDecimal("id").toBigInteger())
                     .findOne()
                     .map(Result::of)
-                    .orElse(Result.ofEmpty());
+                    .orElse(Result.empty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not insert release")
                     .setCause(ex)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 

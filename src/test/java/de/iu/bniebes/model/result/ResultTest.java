@@ -18,7 +18,7 @@ class ResultTest {
 
     @Test
     void result_Empty() {
-        final var dbResult = Result.ofEmpty();
+        final var dbResult = Result.empty();
         assertFalse(dbResult.isPresent());
         assertTrue(dbResult.isEmpty());
         assertFalse(dbResult.isError());
@@ -27,7 +27,7 @@ class ResultTest {
 
     @Test
     void result_Error() {
-        final var dbResult = Result.ofError();
+        final var dbResult = Result.error();
         assertFalse(dbResult.isPresent());
         assertFalse(dbResult.isEmpty());
         assertTrue(dbResult.isError());

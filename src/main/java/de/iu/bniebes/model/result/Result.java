@@ -24,11 +24,11 @@ public class Result<T> {
         return new Result<>(value, false, false);
     }
 
-    public static <T> Result<T> ofEmpty() {
+    public static <T> Result<T> empty() {
         return new Result<>(null, true, false);
     }
 
-    public static <T> Result<T> ofError() {
+    public static <T> Result<T> error() {
         return new Result<>(null, false, true);
     }
 

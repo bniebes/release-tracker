@@ -99,14 +99,14 @@ public class ReleaseOptInfoDBService {
                             mappingFn.apply(rs.getBigDecimal("release_id").toBigInteger(), rs.getString(columnName)))
                     .findOne()
                     .map(Result::of)
-                    .orElse(Result.ofEmpty());
+                    .orElse(Result.empty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not query a release name by release id: {}")
                     .addArgument(id)
                     .log();
-            return Result.ofError();
+            return Result.error();
         }
     }
 }
