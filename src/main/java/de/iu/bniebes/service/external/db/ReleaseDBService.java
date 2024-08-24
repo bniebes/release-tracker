@@ -2,13 +2,13 @@ package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
 import de.iu.bniebes.model.db.Release;
+import de.iu.bniebes.model.result.Result;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class ReleaseDBService {
 
     private final Jdbi jdbi;
 
-    public Optional<Release> release(
+    public Result<Release> release(
             final String application, final String environment, final String version, final Instant releaseTimestamp) {
         try (final var handle = jdbi.open()) {
             final var query =
@@ -33,23 +33,27 @@ public class ReleaseDBService {
             return handle.createQuery(query)
                     .bindMap(releaseBinds(application, environment, version, releaseTimestamp))
                     .map(this::toRelease)
-                    .findOne();
+                    .findOne()
+                    .map(Result::of)
+                    .orElseGet(Result::ofEmpty);
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not query a release")
                     .setCause(ex)
                     .log();
-            return Optional.empty();
+            return Result.ofError();
         }
     }
 
-    public Optional<Release> releaseById(final BigInteger id) {
+    public Result<Release> releaseById(final BigInteger id) {
         try (final var handle = jdbi.open()) {
             return handle.createQuery("SELECT * FROM releases WHERE id = :id;")
                     .bind("id", new BigDecimal(id))
                     .map(this::toRelease)
-                    .findOne();
+                    .findOne()
+                    .map(Result::of)
+                    .orElse(Result.ofEmpty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -57,11 +61,11 @@ public class ReleaseDBService {
                     .addArgument(id)
                     .setCause(ex)
                     .log();
-            return Optional.empty();
+            return Result.ofError();
         }
     }
 
-    public Optional<BigInteger> releaseId(
+    public Result<BigInteger> releaseId(
             final String application, final String environment, final String version, final Instant releaseTimestamp) {
         try (final var handle = jdbi.open()) {
             final var query =
@@ -73,7 +77,9 @@ public class ReleaseDBService {
             return handle.createQuery(query)
                     .bindMap(releaseBinds(application, environment, version, releaseTimestamp))
                     .map((rs, ctx) -> rs.getBigDecimal("id").toBigInteger())
-                    .findOne();
+                    .findOne()
+                    .map(Result::of)
+                    .orElse(Result.ofEmpty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -84,11 +90,11 @@ public class ReleaseDBService {
                     .addArgument(releaseTimestamp)
                     .setCause(ex)
                     .log();
-            return Optional.empty();
+            return Result.ofError();
         }
     }
 
-    public Set<Release> releases(final String application, final String environment, final String version) {
+    public Result<Set<Release>> releases(final String application, final String environment, final String version) {
         try (final var handle = jdbi.open()) {
             final var query =
                     """
@@ -96,12 +102,13 @@ public class ReleaseDBService {
                     FROM releases
                     WHERE application = :app AND environment = :env AND version = :ver;
                     """;
-            return handle.createQuery(query)
+            final var result = handle.createQuery(query)
                     .bind("app", application)
                     .bind("env", environment)
                     .bind("ver", version)
                     .map(this::toRelease)
                     .collectIntoSet();
+            return result.isEmpty() ? Result.ofEmpty() : Result.of(result);
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
@@ -111,11 +118,11 @@ public class ReleaseDBService {
                     .addArgument(version)
                     .setCause(ex)
                     .log();
-            return Set.of();
+            return Result.ofError();
         }
     }
 
-    public Optional<BigInteger> insert(
+    public Result<BigInteger> insert(
             final String application, final String environment, final String version, final Instant releaseTimestamp) {
         try (final var handle = jdbi.open()) {
             final var updateStatement =
@@ -127,14 +134,16 @@ public class ReleaseDBService {
                     .bindMap(releaseBinds(application, environment, version, releaseTimestamp))
                     .executeAndReturnGeneratedKeys("id")
                     .map((rs, ctx) -> rs.getBigDecimal("id").toBigInteger())
-                    .findOne();
+                    .findOne()
+                    .map(Result::of)
+                    .orElse(Result.ofEmpty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not insert release")
                     .setCause(ex)
                     .log();
-            return Optional.empty();
+            return Result.ofError();
         }
     }
 

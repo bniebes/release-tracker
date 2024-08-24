@@ -3,9 +3,9 @@ package de.iu.bniebes.service.internal;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import de.iu.bniebes.model.result.Result;
 import de.iu.bniebes.service.external.db.ReleaseDBService;
 import java.math.BigInteger;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ReleaseCreationServiceTest {
         @Test
         void create() {
             when(releaseDBService.insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
-                    .thenReturn(Optional.of(BigInteger.ONE));
+                    .thenReturn(Result.of(BigInteger.ONE));
 
             final var result = releaseCreationService.create(TEST_APP, TEST_ENV, TEST_VER);
             verify(releaseDBService, times(1)).insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any());
@@ -40,11 +40,11 @@ class ReleaseCreationServiceTest {
         @Test
         void create_insertFailure() {
             when(releaseDBService.insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
-                    .thenReturn(Optional.empty());
+                    .thenReturn(Result.ofError());
 
             final var result = releaseCreationService.create(TEST_APP, TEST_ENV, TEST_VER);
             verify(releaseDBService, times(1)).insert(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any());
-            assertTrue(result.isEmpty());
+            assertTrue(result.isError());
         }
     }
 }

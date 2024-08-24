@@ -2,9 +2,9 @@ package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
 import de.iu.bniebes.model.db.*;
+import de.iu.bniebes.model.result.Result;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class ReleaseOptInfoDBService {
         return insertOptInfo(releaseId, TABLE_RELEASE_NAME, COLUMN_RELEASE_NAME, name);
     }
 
-    public Optional<ReleaseName> releaseNameById(final BigInteger releaseId) {
+    public Result<ReleaseName> releaseNameById(final BigInteger releaseId) {
         return queryByReleaseId(releaseId, TABLE_RELEASE_NAME, COLUMN_RELEASE_NAME, ReleaseName::new);
     }
 
@@ -39,7 +39,7 @@ public class ReleaseOptInfoDBService {
         return insertOptInfo(releaseId, TABLE_DESCRIPTION, COLUMN_DESCRIPTION, description);
     }
 
-    public Optional<Description> descriptionById(final BigInteger releaseId) {
+    public Result<Description> descriptionById(final BigInteger releaseId) {
         return queryByReleaseId(releaseId, TABLE_DESCRIPTION, COLUMN_DESCRIPTION, Description::new);
     }
 
@@ -47,7 +47,7 @@ public class ReleaseOptInfoDBService {
         return insertOptInfo(releaseId, TABLE_CHANGES, COLUMN_CHANGES, changes);
     }
 
-    public Optional<Changes> changesById(final BigInteger releaseId) {
+    public Result<Changes> changesById(final BigInteger releaseId) {
         return queryByReleaseId(releaseId, TABLE_CHANGES, COLUMN_CHANGES, Changes::new);
     }
 
@@ -55,7 +55,7 @@ public class ReleaseOptInfoDBService {
         return insertOptInfo(releaseId, TABLE_RESPONSIBILITY, COLUMN_RESPONSIBILITY, responsibility);
     }
 
-    public Optional<Responsibility> responsibilityById(final BigInteger releaseId) {
+    public Result<Responsibility> responsibilityById(final BigInteger releaseId) {
         return queryByReleaseId(releaseId, TABLE_RESPONSIBILITY, COLUMN_RESPONSIBILITY, Responsibility::new);
     }
 
@@ -63,7 +63,7 @@ public class ReleaseOptInfoDBService {
         return insertOptInfo(releaseId, TABLE_BUILD_LOCATION, COLUMN_BUILD_LOCATION, buildLocation);
     }
 
-    public Optional<BuildLocation> buildLocationById(final BigInteger releaseId) {
+    public Result<BuildLocation> buildLocationById(final BigInteger releaseId) {
         return queryByReleaseId(releaseId, TABLE_BUILD_LOCATION, COLUMN_BUILD_LOCATION, BuildLocation::new);
     }
 
@@ -87,7 +87,7 @@ public class ReleaseOptInfoDBService {
         }
     }
 
-    private <T> Optional<T> queryByReleaseId(
+    private <T> Result<T> queryByReleaseId(
             final BigInteger id,
             final String table,
             final String columnName,
@@ -97,14 +97,16 @@ public class ReleaseOptInfoDBService {
                     .bind("id", new BigDecimal(id))
                     .map((rs, ctx) ->
                             mappingFn.apply(rs.getBigDecimal("release_id").toBigInteger(), rs.getString(columnName)))
-                    .findOne();
+                    .findOne()
+                    .map(Result::of)
+                    .orElse(Result.ofEmpty());
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
                     .setMessage("Could not query a release name by release id: {}")
                     .addArgument(id)
                     .log();
-            return Optional.empty();
+            return Result.ofError();
         }
     }
 }

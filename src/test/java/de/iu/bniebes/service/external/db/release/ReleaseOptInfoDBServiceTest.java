@@ -25,7 +25,7 @@ class ReleaseOptInfoDBServiceTest {
     private static final Instant TEST_TIMESTAMP = Instant.now();
     private static final BigInteger TEST_ID = RELEASE_DB_SERVICE
             .insert(TEST_APP, TEST_ENV, TEST_VER, TEST_TIMESTAMP)
-            .orElseThrow();
+            .get();
 
     private final ReleaseOptInfoDBService releaseOptInfoDBService = new ReleaseOptInfoDBService(JDBI);
 
