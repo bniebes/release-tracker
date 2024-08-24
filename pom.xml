@@ -193,6 +193,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Maven Surefire Plugin - Apache-2.0 - https://maven.apache.org/surefire/ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
