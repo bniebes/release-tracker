@@ -4,6 +4,7 @@ import static de.iu.bniebes.constant.GlobalConstants.*;
 
 import de.iu.bniebes.application.Configuration;
 import de.iu.bniebes.application.EnvironmentAccessor;
+import de.iu.bniebes.application.HttpServices;
 import de.iu.bniebes.application.Services;
 import io.helidon.webserver.WebServer;
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +15,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
 
     private final int port;
     private final Services services;
+    private final HttpServices httpServices;
 
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
@@ -21,7 +23,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
         final var configuration = new Configuration(EnvironmentAccessor.getEnvFromSystem());
         this.port = configuration.webServerConfiguration.port();
         this.services = new Services(configuration);
-        this.port = configuration.webServerConfiguration.port();
+        this.httpServices = new HttpServices(services);
     }
 
     public void run() throws InterruptedException {
@@ -29,8 +31,8 @@ public class ReleaseTrackerApplication implements AutoCloseable {
         WebServer.builder()
                 .port(port)
                 .routing(routing -> routing.get("/", (req, res) -> res.send("Release Tracker"))
-                        .get((req, res) -> res.send("OK")))
                         .get("/health", (req, res) -> res.send("OK"))
+                        .register("/v1/release", httpServices.releaseHttpServiceV1))
                 .build()
                 .start();
         shutdownLatch.await();

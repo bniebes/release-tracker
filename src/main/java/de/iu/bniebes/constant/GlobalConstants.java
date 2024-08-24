@@ -9,6 +9,7 @@ public class GlobalConstants {
         public static final Marker APPLICATION = MarkerFactory.getMarker("application");
         public static final Marker DB = MarkerFactory.getMarker("db");
         public static final Marker TEST = MarkerFactory.getMarker("test");
+        public static final Marker HTTP = MarkerFactory.getMarker("http");
         public static final Marker SERVICE = MarkerFactory.getMarker("service");
     }
 
