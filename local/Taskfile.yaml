@@ -87,6 +87,7 @@ tasks:
     summary: Rebuild application with maven and restart docker services via docker compose
     aliases: ["reload", "start"]
     cmds:
+      - task: mvn:spotless:apply
       - task: mvn:clean:package
       - task: compose:up
 
@@ -97,5 +98,6 @@ tasks:
     cmds:
       - task: compose:down
       - task: clean:pgsql
+      - task: mvn:spotless:apply
       - task: mvn:clean:package
       - task: compose:up
