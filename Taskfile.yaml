@@ -2,7 +2,7 @@ version: '3'
 
 # Release Tracker - Taskfile
 # To run the task the following applications have to be installed locally:
-# taskfile, docker, docker compose, maven
+# taskfile, docker, docker compose, maven, httpie
 
 includes:
   local: "./local"

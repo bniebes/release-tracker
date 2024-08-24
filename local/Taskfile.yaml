@@ -101,3 +101,12 @@ tasks:
       - task: mvn:spotless:apply
       - task: mvn:clean:package
       - task: compose:up
+
+  # HTTP ###############################################################################################################
+
+  http:create:
+    desc: Localhost http call, create endpoint
+    preconditions:
+      - sh: "http -qq http://localhost:30123/health"
+        msg: "The application needs to be running"
+    cmd: "http POST http://localhost:30123/v1/release/release-tracker/local/0.0.1"
