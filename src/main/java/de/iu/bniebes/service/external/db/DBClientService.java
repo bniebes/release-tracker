@@ -2,6 +2,7 @@ package de.iu.bniebes.service.external.db;
 
 import com.zaxxer.hikari.HikariDataSource;
 import de.iu.bniebes.configuration.DBConfiguration;
+import de.iu.bniebes.constant.GlobalConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 
@@ -27,6 +28,10 @@ public class DBClientService implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
+        log.atInfo()
+                .addMarker(GlobalConstants.Markers.SERVICE)
+                .setMessage("Closing hikari data source")
+                .log();
         hikariDataSource.close();
     }
 }
