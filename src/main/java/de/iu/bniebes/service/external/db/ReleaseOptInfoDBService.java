@@ -1,4 +1,4 @@
-package de.iu.bniebes.service.external.db.release;
+package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
 import de.iu.bniebes.model.db.*;
@@ -12,7 +12,7 @@ import org.jdbi.v3.core.Jdbi;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ReleaseOptInfoService {
+public class ReleaseOptInfoDBService {
 
     private static final String TABLE_RELEASE_NAME = "release_names";
     private static final String COLUMN_RELEASE_NAME = "name";

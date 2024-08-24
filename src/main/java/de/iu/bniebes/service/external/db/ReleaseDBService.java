@@ -1,4 +1,4 @@
-package de.iu.bniebes.service.external.db.release;
+package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
 import de.iu.bniebes.model.db.Release;

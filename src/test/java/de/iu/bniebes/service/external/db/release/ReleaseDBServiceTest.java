@@ -2,6 +2,7 @@ package de.iu.bniebes.service.external.db.release;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.iu.bniebes.service.external.db.ReleaseDBService;
 import de.iu.bniebes.service.external.db.helper.DBTestHelper;
 import java.math.BigInteger;
 import java.time.Instant;

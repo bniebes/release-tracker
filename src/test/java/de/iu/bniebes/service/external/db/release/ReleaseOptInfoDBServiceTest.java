@@ -2,6 +2,8 @@ package de.iu.bniebes.service.external.db.release;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.iu.bniebes.service.external.db.ReleaseDBService;
+import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import de.iu.bniebes.service.external.db.helper.DBTestHelper;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 @Slf4j
 @EnabledIfSystemProperty(named = "test.condition.pgsql", matches = "true")
-class ReleaseOptInfoServiceTest {
+class ReleaseOptInfoDBServiceTest {
 
     private static final Jdbi JDBI = DBTestHelper.createTestJdbi();
     private static final ReleaseDBService RELEASE_DB_SERVICE = new ReleaseDBService(JDBI);
@@ -25,11 +27,11 @@ class ReleaseOptInfoServiceTest {
             .insert(TEST_APP, TEST_ENV, TEST_VER, TEST_TIMESTAMP)
             .orElseThrow();
 
-    private final ReleaseOptInfoService releaseOptInfoService = new ReleaseOptInfoService(JDBI);
+    private final ReleaseOptInfoDBService releaseOptInfoDBService = new ReleaseOptInfoDBService(JDBI);
 
     @Test
     void valueNotPresent() {
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.releaseNameById(BigInteger.ZERO));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.releaseNameById(BigInteger.ZERO));
         assertTrue(queryResult.isEmpty());
     }
 
@@ -37,11 +39,11 @@ class ReleaseOptInfoServiceTest {
     void releaseNameTest() {
         final var value = "release-name";
 
-        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoService.insertReleaseName(TEST_ID, value));
+        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoDBService.insertReleaseName(TEST_ID, value));
         DBTestHelper.infoLogResult(insertResult);
         assertTrue(insertResult);
 
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.releaseNameById(TEST_ID));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.releaseNameById(TEST_ID));
         DBTestHelper.infoLogResult(queryResult);
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
@@ -52,11 +54,11 @@ class ReleaseOptInfoServiceTest {
     void descriptionTest() {
         final var value = "description";
 
-        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoService.insertDescription(TEST_ID, value));
+        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoDBService.insertDescription(TEST_ID, value));
         DBTestHelper.infoLogResult(insertResult);
         assertTrue(insertResult);
 
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.descriptionById(TEST_ID));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.descriptionById(TEST_ID));
         DBTestHelper.infoLogResult(queryResult);
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
@@ -67,11 +69,11 @@ class ReleaseOptInfoServiceTest {
     void changesTest() {
         final var value = "changes";
 
-        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoService.insertChanges(TEST_ID, value));
+        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoDBService.insertChanges(TEST_ID, value));
         DBTestHelper.infoLogResult(insertResult);
         assertTrue(insertResult);
 
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.changesById(TEST_ID));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.changesById(TEST_ID));
         DBTestHelper.infoLogResult(queryResult);
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
@@ -82,11 +84,11 @@ class ReleaseOptInfoServiceTest {
     void responsibilityTest() {
         final var value = "responsibility";
 
-        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoService.insertResponsibility(TEST_ID, value));
+        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoDBService.insertResponsibility(TEST_ID, value));
         DBTestHelper.infoLogResult(insertResult);
         assertTrue(insertResult);
 
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.responsibilityById(TEST_ID));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.responsibilityById(TEST_ID));
         DBTestHelper.infoLogResult(queryResult);
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
@@ -97,11 +99,11 @@ class ReleaseOptInfoServiceTest {
     void buildLocationTest() {
         final var value = "build-location";
 
-        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoService.insertBuildLocation(TEST_ID, value));
+        final var insertResult = assertDoesNotThrow(() -> releaseOptInfoDBService.insertBuildLocation(TEST_ID, value));
         DBTestHelper.infoLogResult(insertResult);
         assertTrue(insertResult);
 
-        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoService.buildLocationById(TEST_ID));
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.buildLocationById(TEST_ID));
         DBTestHelper.infoLogResult(queryResult);
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
