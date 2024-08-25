@@ -39,7 +39,7 @@ public class ReleaseHttpServiceV1 implements HttpService {
             }
 
             final var maybeCreateResult = releaseCreationService.create(maybeApp.get(), maybeEnv.get(), maybeVer.get());
-            if (maybeCreateResult.isEmpty()) {
+            if (maybeCreateResult.notPresent()) {
                 log.atError()
                         .addMarker(GlobalConstants.Markers.HTTP)
                         .setMessage("Could not create a release")
