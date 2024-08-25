@@ -185,6 +185,37 @@ class ReleaseAccessServiceTest {
         }
     }
 
+    @Nested
+    class AllByApplicationAndEnvironmentTests {
+
+        @Test
+        void allByApplication() {
+            when(mockReleaseDBService.fullReleasesByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.of(testFullReleases()));
+
+            final var result = releaseAccessService.allByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isPresent());
+        }
+
+        @Test
+        void allByApplication_DBEmpty() {
+            when(mockReleaseDBService.fullReleasesByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.empty());
+
+            final var result = releaseAccessService.allByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void allByApplication_DBError() {
+            when(mockReleaseDBService.fullReleasesByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.error());
+
+            final var result = releaseAccessService.allByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isError());
+        }
+    }
+
     private static Set<FullRelease> testFullReleases() {
         return Set.of(
                 new FullRelease(

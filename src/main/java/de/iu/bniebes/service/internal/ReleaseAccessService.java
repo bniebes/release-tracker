@@ -90,6 +90,15 @@ public class ReleaseAccessService {
         return toJson(maybeFullReleases.get());
     }
 
+    public Result<String> allByApplicationAndEnvironment(final String application, final String environment) {
+        final var maybeFullReleases =
+                releaseDBService.fullReleasesByApplicationAndEnvironment(application, environment);
+        if (maybeFullReleases.isEmpty()) return Result.empty();
+        if (maybeFullReleases.isError()) return Result.error();
+
+        return toJson(maybeFullReleases.get());
+    }
+
     private Result<String> toJson(final Set<FullRelease> fullReleases) {
         if (fullReleases.isEmpty()) return Result.empty();
         try {

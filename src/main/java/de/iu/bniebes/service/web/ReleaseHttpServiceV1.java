@@ -1,6 +1,7 @@
 package de.iu.bniebes.service.web;
 
 import de.iu.bniebes.constant.GlobalConstants;
+import de.iu.bniebes.model.result.Result;
 import de.iu.bniebes.service.internal.InputSanitizationService;
 import de.iu.bniebes.service.internal.ReleaseAccessService;
 import de.iu.bniebes.service.internal.ReleaseCreationService;
@@ -26,6 +27,7 @@ public class ReleaseHttpServiceV1 implements HttpService {
         httpRules
                 .get("/", this::all)
                 .get("/{app}", this::allByApplication)
+                .get("/{app}/{env}", this::allByApplicationAndEnvironment)
                 .post("/{app}/{env}/{ver}", this::create)
                 .get("/{app}/{env}/{ver}/{zet}", this::get);
     }
@@ -45,7 +47,6 @@ public class ReleaseHttpServiceV1 implements HttpService {
             final var maybeCreateResult = releaseCreationService.create(maybeApp.get(), maybeEnv.get(), maybeVer.get());
             if (maybeCreateResult.notPresent()) {
                 onErrorResult("Could not create a release", response);
-                response.status(Status.INTERNAL_SERVER_ERROR_500).send();
                 return;
             }
 
@@ -68,34 +69,15 @@ public class ReleaseHttpServiceV1 implements HttpService {
                 return;
             }
 
-            final var maybeResponse =
-                    releaseAccessService.get(maybeApp.get(), maybeEnv.get(), maybeVer.get(), maybeZet.get());
-            if (maybeResponse.isEmpty()) {
-                response.status(Status.NOT_FOUND_404).send();
-                return;
-            }
-            if (maybeResponse.isError()) {
-                response.status(Status.INTERNAL_SERVER_ERROR_500).send();
-                return;
-            }
-
-            response.send(maybeResponse.get());
+            final var result = releaseAccessService.get(maybeApp.get(), maybeEnv.get(), maybeVer.get(), maybeZet.get());
+            respondAccordingToResult(result, response, "Could not get release");
         } catch (NoSuchElementException nseEx) {
             onNoSuchElementException(nseEx, response);
         }
     }
 
     private void all(final ServerRequest request, final ServerResponse response) {
-        final var maybeAllResponse = releaseAccessService.all();
-        if (maybeAllResponse.isEmpty()) {
-            response.status(Status.NOT_FOUND_404).send();
-            return;
-        }
-        if (maybeAllResponse.isError()) {
-            onErrorResult("Could not retrieve releases", response);
-            return;
-        }
-        response.send(maybeAllResponse.get());
+        respondAccordingToResult(releaseAccessService.all(), response, "Could not retrieve releases");
     }
 
     private void allByApplication(final ServerRequest request, final ServerResponse response) {
@@ -108,16 +90,26 @@ public class ReleaseHttpServiceV1 implements HttpService {
                 return;
             }
 
-            final var maybeResult = releaseAccessService.allByApplication(maybeApp.get());
-            if (maybeResult.isEmpty()) {
-                response.status(Status.NOT_FOUND_404).send();
+            final var result = releaseAccessService.allByApplication(maybeApp.get());
+            respondAccordingToResult(result, response, "Could not retrieve releases");
+        } catch (NoSuchElementException nseEx) {
+            onNoSuchElementException(nseEx, response);
+        }
+    }
+
+    private void allByApplicationAndEnvironment(final ServerRequest request, final ServerResponse response) {
+        try {
+            final var parameters = request.path().pathParameters();
+            final var maybeApp = inputSanitizationService.safeString(parameters.get("app"));
+            final var maybeEnv = inputSanitizationService.safeString(parameters.get("env"));
+
+            if (maybeApp.isEmpty() || maybeEnv.isEmpty()) {
+                response.status(Status.BAD_REQUEST_400).send();
                 return;
             }
-            if (maybeResult.isError()) {
-                onErrorResult("Could not retrieve releases", response);
-                return;
-            }
-            response.send(maybeResult.get());
+
+            final var result = releaseAccessService.allByApplicationAndEnvironment(maybeApp.get(), maybeEnv.get());
+            respondAccordingToResult(result, response, "Could not retrieve releases");
         } catch (NoSuchElementException nseEx) {
             onNoSuchElementException(nseEx, response);
         }
@@ -134,5 +126,18 @@ public class ReleaseHttpServiceV1 implements HttpService {
                 .setMessage(message)
                 .log();
         response.status(Status.INTERNAL_SERVER_ERROR_500).send();
+    }
+
+    private void respondAccordingToResult(
+            final Result<String> result, final ServerResponse response, final String errorMsg) {
+        if (result.isEmpty()) {
+            response.status(Status.NOT_FOUND_404).send();
+            return;
+        }
+        if (result.isError()) {
+            onErrorResult(errorMsg, response);
+            return;
+        }
+        response.send(result.get());
     }
 }
