@@ -79,6 +79,13 @@ class ReleaseDBServiceTest {
     }
 
     @Test
+    void fullReleasesByApplication() {
+        final var result = assertDoesNotThrow(() -> releaseDBService.fullReleasesByApplication(TEST_APPLICATION));
+        assertTrue(result.isPresent());
+        assertFalse(result.get().isEmpty());
+    }
+
+    @Test
     void insert() {
         final var app = "test-insert";
         final var env = "test-insert";

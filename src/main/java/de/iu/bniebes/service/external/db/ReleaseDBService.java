@@ -159,7 +159,7 @@ public class ReleaseDBService {
                     LEFT JOIN descriptions d on releases.id = d.release_id
                     LEFT JOIN changes c on releases.id = c.release_id
                     LEFT JOIN responsibility r on c.release_id = r.release_id
-                    LEFT JOIN build_location bl on releases.id = bl.release_id;
+                    LEFT JOIN build_location bl on releases.id = bl.release_id
                 """;
         try (final var handle = jdbi.open()) {
             final var fullReleases =
@@ -168,7 +168,37 @@ public class ReleaseDBService {
         } catch (Exception ex) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.DB)
-                    .setMessage("Could not insert release")
+                    .setMessage("Could not query fullReleases")
+                    .setCause(ex)
+                    .log();
+            return Result.error();
+        }
+    }
+
+    public Result<Set<FullRelease>> fullReleasesByApplication(final String application) {
+        final var query =
+                """
+                SELECT
+                    id, application, environment, version, release_timestamp,
+                    rn.name, d.description, c.changes, r.responsibility, bl.build_location
+                FROM releases
+                    LEFT JOIN release_names rn on releases.id = rn.release_id
+                    LEFT JOIN descriptions d on releases.id = d.release_id
+                    LEFT JOIN changes c on releases.id = c.release_id
+                    LEFT JOIN responsibility r on c.release_id = r.release_id
+                    LEFT JOIN build_location bl on releases.id = bl.release_id
+                WHERE application = :app;
+                """;
+        try (final var handle = jdbi.open()) {
+            final var fullReleases = handle.createQuery(query)
+                    .bind("app", application)
+                    .map(this::toFullRelease)
+                    .collectIntoSet();
+            return fullReleases.isEmpty() ? Result.empty() : Result.of(fullReleases);
+        } catch (Exception ex) {
+            log.atError()
+                    .addMarker(GlobalConstants.Markers.DB)
+                    .setMessage("Could not query fullReleases")
                     .setCause(ex)
                     .log();
             return Result.error();

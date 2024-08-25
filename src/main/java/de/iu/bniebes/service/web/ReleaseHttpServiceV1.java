@@ -25,6 +25,7 @@ public class ReleaseHttpServiceV1 implements HttpService {
     public void routing(final HttpRules httpRules) {
         httpRules
                 .get("/", this::all)
+                .get("/{app}", this::allByApplication)
                 .post("/{app}/{env}/{ver}", this::create)
                 .get("/{app}/{env}/{ver}/{zet}", this::get);
     }
@@ -95,6 +96,31 @@ public class ReleaseHttpServiceV1 implements HttpService {
             return;
         }
         response.send(maybeAllResponse.get());
+    }
+
+    private void allByApplication(final ServerRequest request, final ServerResponse response) {
+        try {
+            final var parameters = request.path().pathParameters();
+            final var maybeApp = inputSanitizationService.safeString(parameters.get("app"));
+
+            if (maybeApp.isEmpty()) {
+                response.status(Status.BAD_REQUEST_400).send();
+                return;
+            }
+
+            final var maybeResult = releaseAccessService.allByApplication(maybeApp.get());
+            if (maybeResult.isEmpty()) {
+                response.status(Status.NOT_FOUND_404).send();
+                return;
+            }
+            if (maybeResult.isError()) {
+                onErrorResult("Could not retrieve releases", response);
+                return;
+            }
+            response.send(maybeResult.get());
+        } catch (NoSuchElementException nseEx) {
+            onNoSuchElementException(nseEx, response);
+        }
     }
 
     private void onNoSuchElementException(final NoSuchElementException nseEx, final ServerResponse response) {

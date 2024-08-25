@@ -5,11 +5,13 @@ import static de.iu.bniebes.util.TimestampUtils.instantOf;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iu.bniebes.constant.GlobalConstants;
+import de.iu.bniebes.model.db.FullRelease;
 import de.iu.bniebes.model.response.ReleaseResponse;
 import de.iu.bniebes.model.result.Result;
 import de.iu.bniebes.service.external.db.ReleaseDBService;
 import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import java.math.BigInteger;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -77,11 +79,23 @@ public class ReleaseAccessService {
         if (maybeFullReleases.isEmpty()) return Result.empty();
         if (maybeFullReleases.isError()) return Result.error();
 
-        final var fullReleases =
-                maybeFullReleases.get().stream().map(ReleaseResponse::of).collect(Collectors.toSet());
+        return toJson(maybeFullReleases.get());
+    }
 
+    public Result<String> allByApplication(final String application) {
+        final var maybeFullReleases = releaseDBService.fullReleasesByApplication(application);
+        if (maybeFullReleases.isEmpty()) return Result.empty();
+        if (maybeFullReleases.isError()) return Result.error();
+
+        return toJson(maybeFullReleases.get());
+    }
+
+    private Result<String> toJson(final Set<FullRelease> fullReleases) {
+        if (fullReleases.isEmpty()) return Result.empty();
         try {
-            return Result.of(mapper.writeValueAsString(fullReleases));
+            final var releaseResponses =
+                    fullReleases.stream().map(ReleaseResponse::of).collect(Collectors.toSet());
+            return Result.of(mapper.writeValueAsString(releaseResponses));
         } catch (JsonProcessingException jpEx) {
             log.atError()
                     .addMarker(GlobalConstants.Markers.SERVICE)

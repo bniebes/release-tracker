@@ -134,21 +134,7 @@ class ReleaseAccessServiceTest {
 
         @Test
         void all() {
-            final var fullReleases = Set.of(
-                    new FullRelease(
-                            BigInteger.ONE,
-                            TEST_APP,
-                            TEST_ENV,
-                            TEST_VER,
-                            Instant.now(),
-                            "test",
-                            "test",
-                            "test",
-                            "test",
-                            "test"),
-                    new FullRelease(
-                            BigInteger.TWO, TEST_APP, TEST_ENV, TEST_VER, Instant.now(), null, null, null, null, null));
-            when(mockReleaseDBService.fullReleases()).thenReturn(Result.of(fullReleases));
+            when(mockReleaseDBService.fullReleases()).thenReturn(Result.of(testFullReleases()));
 
             final var result = releaseAccessService.all();
             assertTrue(result.isPresent());
@@ -169,5 +155,50 @@ class ReleaseAccessServiceTest {
             final var result = releaseAccessService.all();
             assertTrue(result.isError());
         }
+    }
+
+    @Nested
+    class AllByApplicationTests {
+
+        @Test
+        void allByApplication() {
+            when(mockReleaseDBService.fullReleasesByApplication(TEST_APP)).thenReturn(Result.of(testFullReleases()));
+
+            final var result = releaseAccessService.allByApplication(TEST_APP);
+            assertTrue(result.isPresent());
+        }
+
+        @Test
+        void allByApplication_DBEmpty() {
+            when(mockReleaseDBService.fullReleasesByApplication(TEST_APP)).thenReturn(Result.empty());
+
+            final var result = releaseAccessService.allByApplication(TEST_APP);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void allByApplication_DBError() {
+            when(mockReleaseDBService.fullReleasesByApplication(TEST_APP)).thenReturn(Result.error());
+
+            final var result = releaseAccessService.allByApplication(TEST_APP);
+            assertTrue(result.isError());
+        }
+    }
+
+    private static Set<FullRelease> testFullReleases() {
+        return Set.of(
+                new FullRelease(
+                        BigInteger.ONE,
+                        TEST_APP,
+                        TEST_ENV,
+                        TEST_VER,
+                        Instant.now(),
+                        "test",
+                        "test",
+                        "test",
+                        "test",
+                        "test"),
+                new FullRelease(
+                        BigInteger.TWO, TEST_APP, TEST_ENV, TEST_VER, Instant.now(), null, null, null, null, null));
     }
 }
