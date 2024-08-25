@@ -28,6 +28,7 @@ NOTE: Base URL: /v1/release
 |Create |POST |/<app>/<env>/<ver> |Create a new release, implicit now
 |Create or Update |PUT |/<app>/<env>/<ver>/<zen> |Create a new release or update if it already exists
 |Get |GET |/<app>/<env>/<ver>/<zen> |Get a specific release
+|All |GET |/ |Get all releases
 |All by App |GET |/<app> |Get all releases of the application
 |All by App,Env |GET |/<app>/<env> |Get all releases of the application and environment
 |===
