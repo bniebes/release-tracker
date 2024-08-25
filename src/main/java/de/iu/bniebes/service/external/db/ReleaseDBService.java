@@ -1,6 +1,7 @@
 package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
+import de.iu.bniebes.model.db.FullRelease;
 import de.iu.bniebes.model.db.Release;
 import de.iu.bniebes.model.result.Result;
 import java.math.BigDecimal;
@@ -147,6 +148,33 @@ public class ReleaseDBService {
         }
     }
 
+    public Result<Set<FullRelease>> fullReleases() {
+        final var query =
+                """
+                SELECT
+                    id, application, environment, version, release_timestamp,
+                    rn.name, d.description, c.changes, r.responsibility, bl.build_location
+                FROM releases
+                    LEFT JOIN release_names rn on releases.id = rn.release_id
+                    LEFT JOIN descriptions d on releases.id = d.release_id
+                    LEFT JOIN changes c on releases.id = c.release_id
+                    LEFT JOIN responsibility r on c.release_id = r.release_id
+                    LEFT JOIN build_location bl on releases.id = bl.release_id;
+                """;
+        try (final var handle = jdbi.open()) {
+            final var fullReleases =
+                    handle.createQuery(query).map(this::toFullRelease).collectIntoSet();
+            return fullReleases.isEmpty() ? Result.empty() : Result.of(fullReleases);
+        } catch (Exception ex) {
+            log.atError()
+                    .addMarker(GlobalConstants.Markers.DB)
+                    .setMessage("Could not insert release")
+                    .setCause(ex)
+                    .log();
+            return Result.error();
+        }
+    }
+
     private Map<String, ?> releaseBinds(
             final String application, final String environment, final String version, final Instant releaseTimestamp) {
         return Map.ofEntries(
@@ -163,5 +191,19 @@ public class ReleaseDBService {
                 rs.getString("version"),
                 rs.getTimestamp("release_timestamp").toInstant(),
                 rs.getBigDecimal("id").toBigInteger());
+    }
+
+    private FullRelease toFullRelease(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        return new FullRelease(
+                rs.getBigDecimal("id").toBigInteger(),
+                rs.getString("application"),
+                rs.getString("environment"),
+                rs.getString("version"),
+                rs.getTimestamp("release_timestamp").toInstant(),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getString("changes"),
+                rs.getString("responsibility"),
+                rs.getString("build_location"));
     }
 }

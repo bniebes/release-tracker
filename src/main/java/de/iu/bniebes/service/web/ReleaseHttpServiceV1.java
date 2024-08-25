@@ -23,7 +23,10 @@ public class ReleaseHttpServiceV1 implements HttpService {
 
     @Override
     public void routing(final HttpRules httpRules) {
-        httpRules.post("/{app}/{env}/{ver}", this::create).get("/{app}/{env}/{ver}/{zet}", this::get);
+        httpRules
+                .get("/", this::all)
+                .post("/{app}/{env}/{ver}", this::create)
+                .get("/{app}/{env}/{ver}/{zet}", this::get);
     }
 
     private void create(final ServerRequest request, final ServerResponse response) {
@@ -40,10 +43,7 @@ public class ReleaseHttpServiceV1 implements HttpService {
 
             final var maybeCreateResult = releaseCreationService.create(maybeApp.get(), maybeEnv.get(), maybeVer.get());
             if (maybeCreateResult.notPresent()) {
-                log.atError()
-                        .addMarker(GlobalConstants.Markers.HTTP)
-                        .setMessage("Could not create a release")
-                        .log();
+                onErrorResult("Could not create a release", response);
                 response.status(Status.INTERNAL_SERVER_ERROR_500).send();
                 return;
             }
@@ -84,8 +84,25 @@ public class ReleaseHttpServiceV1 implements HttpService {
         }
     }
 
+    private void all(final ServerRequest request, final ServerResponse response) {
+        final var maybeAllResponse = releaseAccessService.all();
+        if (maybeAllResponse.notPresent()) {
+            onErrorResult("Could not retrieve releases", response);
+            return;
+        }
+        response.send(maybeAllResponse.get());
+    }
+
     private void onNoSuchElementException(final NoSuchElementException nseEx, final ServerResponse response) {
         log.atError().addMarker(GlobalConstants.Markers.HTTP).setCause(nseEx).log();
+        response.status(Status.INTERNAL_SERVER_ERROR_500).send();
+    }
+
+    private void onErrorResult(final String message, final ServerResponse response) {
+        log.atError()
+                .addMarker(GlobalConstants.Markers.HTTP)
+                .setMessage(message)
+                .log();
         response.status(Status.INTERNAL_SERVER_ERROR_500).send();
     }
 }

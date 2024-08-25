@@ -12,6 +12,7 @@ import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import java.math.BigInteger;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,6 +67,25 @@ public class ReleaseAccessService {
             log.atError()
                     .addMarker(GlobalConstants.Markers.SERVICE)
                     .setCause(ex)
+                    .log();
+            return Result.error();
+        }
+    }
+
+    public Result<String> all() {
+        final var maybeFullReleases = releaseDBService.fullReleases();
+        if (maybeFullReleases.isEmpty()) return Result.empty();
+        if (maybeFullReleases.isError()) return Result.error();
+
+        final var fullReleases =
+                maybeFullReleases.get().stream().map(ReleaseResponse::of).collect(Collectors.toSet());
+
+        try {
+            return Result.of(mapper.writeValueAsString(fullReleases));
+        } catch (JsonProcessingException jpEx) {
+            log.atError()
+                    .addMarker(GlobalConstants.Markers.SERVICE)
+                    .setCause(jpEx)
                     .log();
             return Result.error();
         }
