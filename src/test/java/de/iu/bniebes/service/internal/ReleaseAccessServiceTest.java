@@ -12,6 +12,7 @@ import de.iu.bniebes.service.external.db.ReleaseDBService;
 import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -124,6 +125,48 @@ class ReleaseAccessServiceTest {
                     .thenReturn(Result.error());
 
             final var result = releaseAccessService.get(TEST_APP, TEST_ENV, TEST_VER, BigInteger.valueOf(12345));
+            assertTrue(result.isError());
+        }
+    }
+
+    @Nested
+    class AllTests {
+
+        @Test
+        void all() {
+            final var fullReleases = Set.of(
+                    new FullRelease(
+                            BigInteger.ONE,
+                            TEST_APP,
+                            TEST_ENV,
+                            TEST_VER,
+                            Instant.now(),
+                            "test",
+                            "test",
+                            "test",
+                            "test",
+                            "test"),
+                    new FullRelease(
+                            BigInteger.TWO, TEST_APP, TEST_ENV, TEST_VER, Instant.now(), null, null, null, null, null));
+            when(mockReleaseDBService.fullReleases()).thenReturn(Result.of(fullReleases));
+
+            final var result = releaseAccessService.all();
+            assertTrue(result.isPresent());
+        }
+
+        @Test
+        void all_DBEmpty() {
+            when(mockReleaseDBService.fullReleases()).thenReturn(Result.empty());
+
+            final var result = releaseAccessService.all();
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void all_DBError() {
+            when(mockReleaseDBService.fullReleases()).thenReturn(Result.error());
+
+            final var result = releaseAccessService.all();
             assertTrue(result.isError());
         }
     }
