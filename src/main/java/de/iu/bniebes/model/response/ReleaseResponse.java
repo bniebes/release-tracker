@@ -1,6 +1,6 @@
 package de.iu.bniebes.model.response;
 
-import static de.iu.bniebes.util.TimestampUtils.zuluEpochNanosOf;
+import static de.iu.bniebes.util.TimestampUtils.zuluEpochMicrosOf;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.iu.bniebes.model.db.*;
@@ -13,7 +13,7 @@ public record ReleaseResponse(
         String application,
         String environment,
         String version,
-        BigInteger zuluEpochNanos,
+        BigInteger zuluEpochMicros,
         String releaseName,
         String description,
         String changes,
@@ -32,7 +32,7 @@ public record ReleaseResponse(
                 release.application(),
                 release.environment(),
                 release.version(),
-                zuluEpochNanosOf(release.releaseTimestamp()),
+                zuluEpochMicrosOf(release.releaseTimestamp()),
                 releaseNameResult.isPresent() ? releaseNameResult.get().name() : "",
                 descriptionResult.isPresent() ? descriptionResult.get().description() : "",
                 changesResult.isPresent() ? changesResult.get().changes() : "",
@@ -45,7 +45,7 @@ public record ReleaseResponse(
                 fullRelease.application(),
                 fullRelease.environment(),
                 fullRelease.version(),
-                zuluEpochNanosOf(fullRelease.releaseTimestamp()),
+                zuluEpochMicrosOf(fullRelease.releaseTimestamp()),
                 valueOrBlank(fullRelease.releaseName()),
                 valueOrBlank(fullRelease.description()),
                 valueOrBlank(fullRelease.changes()),

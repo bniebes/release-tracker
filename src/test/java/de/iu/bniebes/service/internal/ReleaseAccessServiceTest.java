@@ -1,6 +1,6 @@
 package de.iu.bniebes.service.internal;
 
-import static de.iu.bniebes.util.TimestampUtils.zuluEpochNanosOf;
+import static de.iu.bniebes.util.TimestampUtils.zuluEpochMicrosOf;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -42,7 +42,7 @@ class ReleaseAccessServiceTest {
         void get() {
             final var id = BigInteger.ONE;
             final var timestamp = Instant.now();
-            final var zuluEpochNanos = zuluEpochNanosOf(timestamp);
+            final var zuluEpochNanos = zuluEpochMicrosOf(timestamp);
 
             final var testReleaseName = "test-release-name";
             final var testDescription = "test-description";
@@ -70,7 +70,7 @@ class ReleaseAccessServiceTest {
             assertEquals(TEST_APP, response.application());
             assertEquals(TEST_ENV, response.environment());
             assertEquals(TEST_VER, response.version());
-            assertEquals(zuluEpochNanos, response.zuluEpochNanos());
+            assertEquals(zuluEpochNanos, response.zuluEpochMicros());
             assertEquals(testReleaseName, response.releaseName());
             assertEquals(testDescription, response.description());
             assertEquals(testChanges, response.changes());
@@ -83,7 +83,7 @@ class ReleaseAccessServiceTest {
         void get_NoOptionalInfo() {
             final var id = BigInteger.ONE;
             final var timestamp = Instant.now();
-            final var zuluEpochNanos = zuluEpochNanosOf(timestamp);
+            final var zuluEpochNanos = zuluEpochMicrosOf(timestamp);
 
             when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, timestamp, id)));
@@ -101,7 +101,7 @@ class ReleaseAccessServiceTest {
             assertEquals(TEST_APP, response.application());
             assertEquals(TEST_ENV, response.environment());
             assertEquals(TEST_VER, response.version());
-            assertEquals(zuluEpochNanos, response.zuluEpochNanos());
+            assertEquals(zuluEpochNanos, response.zuluEpochMicros());
             assertNull(response.releaseName());
             assertNull(response.description());
             assertNull(response.changes());

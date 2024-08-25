@@ -26,8 +26,8 @@ NOTE: Base URL: /v1/release
 |Name |Method |Sub Path |Description
 
 |Create |POST |/<app>/<env>/<ver> |Create a new release, implicit now
-|Create or Update |PUT |/<app>/<env>/<ver>/<zen> |Create a new release or update if it already exists
-|Get |GET |/<app>/<env>/<ver>/<zen> |Get a specific release
+|Create or Update |PUT |/<app>/<env>/<ver>/<zeu> |Create a new release or update if it already exists
+|Get |GET |/<app>/<env>/<ver>/<zeu> |Get a specific release
 |All |GET |/ |Get all releases
 |All by App |GET |/<app> |Get all releases of the application
 |All by App,Env |GET |/<app>/<env> |Get all releases of the application and environment
@@ -46,9 +46,10 @@ Optional Information can be attached with the create or update endpoint as Json 
 ** Environment
 * <ver>
 ** Version
-* <zen>
-** zulu epoch nanos
-** Nanoseconds since unix epoch
+* <zeu>
+** zulu epoch micros
+** Microseconds since unix epoch
+** u -> micro
 --
 
 === Util
@@ -59,6 +60,6 @@ NOTE: Base URL: /v1/util
 |===
 |Name |Method |Sub Path |Description
 
-|Now |GET |/zen |Get the current nanoseconds since zulu epoch
-|Convert |GET |/zen/<datetime> |Convert the <datetime> to zulu epoch nanos, <datetime> is expected to be ISO8601
+|Now |GET |/zeu |Get the current microseconds since zulu epoch
+|Convert |GET |/zeu/<datetime> |Convert the <datetime> to zulu epoch micros, <datetime> is expected to be ISO8601
 |===
