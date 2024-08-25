@@ -12,7 +12,7 @@ public class HttpServices {
 
     public HttpServices(final Services services) {
         log.atInfo().addMarker(Markers.APPLICATION).setMessage("Set-Up").log();
-        this.releaseHttpServiceV1 =
-                new ReleaseHttpServiceV1(services.inputSanitizationService, services.releaseCreationService);
+        this.releaseHttpServiceV1 = new ReleaseHttpServiceV1(
+                services.inputSanitizationService, services.releaseCreationService, services.releaseAccessService);
     }
 }

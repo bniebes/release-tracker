@@ -1,5 +1,6 @@
 package de.iu.bniebes.service.internal;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +20,8 @@ public class InputSanitizationService {
             Pattern.compile("^[\\w |.;,\\-]+$").asPredicate();
     private final Predicate<String> safeTextPattern =
             Pattern.compile("^[\\w\\s |.:,;!?$%#+*/()\\\\-]+$").asPredicate();
+    private final Predicate<String> bigIntegerPattern =
+            Pattern.compile("^\\d+$").asPredicate();
 
     public Optional<String> safeString(final String input) {
         if (isNullOrBlank(input)) return Optional.empty();
@@ -43,6 +46,11 @@ public class InputSanitizationService {
         } catch (DateTimeParseException dtpEx) {
             return Optional.empty();
         }
+    }
+
+    public Optional<BigInteger> bigInteger(final String input) {
+        if (isNullOrBlank(input)) return Optional.empty();
+        return bigIntegerPattern.test(input) ? Optional.of(new BigInteger(input)) : Optional.empty();
     }
 
     private boolean isNullOrBlank(final String input) {

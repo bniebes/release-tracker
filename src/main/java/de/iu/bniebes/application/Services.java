@@ -6,6 +6,7 @@ import de.iu.bniebes.service.external.db.DBClientService;
 import de.iu.bniebes.service.external.db.ReleaseDBService;
 import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import de.iu.bniebes.service.internal.InputSanitizationService;
+import de.iu.bniebes.service.internal.ReleaseAccessService;
 import de.iu.bniebes.service.internal.ReleaseCreationService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +19,7 @@ public class Services implements AutoCloseable {
     public final ReleaseOptInfoDBService releaseOptInfoDBService;
     public final InputSanitizationService inputSanitizationService;
     public final ReleaseCreationService releaseCreationService;
+    public final ReleaseAccessService releaseAccessService;
 
     public Services(final Configuration configuration) {
         log.atInfo().addMarker(Markers.APPLICATION).setMessage("Set-Up").log();
@@ -27,6 +29,7 @@ public class Services implements AutoCloseable {
         this.releaseOptInfoDBService = new ReleaseOptInfoDBService(dbClientService.jdbi);
         this.inputSanitizationService = new InputSanitizationService();
         this.releaseCreationService = new ReleaseCreationService(releaseDBService);
+        this.releaseAccessService = new ReleaseAccessService(releaseDBService, releaseOptInfoDBService);
     }
 
     @Override

@@ -2,6 +2,7 @@ package de.iu.bniebes.service.internal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.Nested;
@@ -131,6 +132,33 @@ class InputSanitizationServiceTest {
 
             final var resultBlank = inputSanitizationService.offsetDateTime(" ");
             assertTrue(resultBlank.isEmpty());
+        }
+    }
+
+    @Nested
+    class BigIntegerTests {
+
+        @Test
+        void bigInteger() {
+            final var testValue = BigInteger.valueOf(1724546084593636001L);
+            final var result = inputSanitizationService.bigInteger(testValue.toString());
+            assertTrue(result.isPresent());
+            assertEquals(testValue, result.get());
+        }
+
+        @Test
+        void bigInteger_NotNumeric() {
+            final var result = inputSanitizationService.bigInteger("test");
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void bigInteger_NullOrEmpty() {
+            final var resultEmpty = inputSanitizationService.bigInteger("");
+            assertTrue(resultEmpty.isEmpty());
+
+            final var resultNull = inputSanitizationService.bigInteger(null);
+            assertTrue(resultNull.isEmpty());
         }
     }
 }
