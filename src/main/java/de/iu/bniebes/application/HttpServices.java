@@ -16,6 +16,6 @@ public class HttpServices {
         log.atInfo().addMarker(Markers.APPLICATION).setMessage("Set-Up").log();
         this.releaseHttpServiceV1 = new ReleaseHttpServiceV1(
                 services.inputSanitizationService, services.releaseCreationService, services.releaseAccessService);
-        this.utilHttpServiceV1 = new UtilHttpServiceV1();
+        this.utilHttpServiceV1 = new UtilHttpServiceV1(services.inputSanitizationService);
     }
 }
