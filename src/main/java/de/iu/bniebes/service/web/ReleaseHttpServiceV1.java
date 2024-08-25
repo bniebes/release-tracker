@@ -86,7 +86,11 @@ public class ReleaseHttpServiceV1 implements HttpService {
 
     private void all(final ServerRequest request, final ServerResponse response) {
         final var maybeAllResponse = releaseAccessService.all();
-        if (maybeAllResponse.notPresent()) {
+        if (maybeAllResponse.isEmpty()) {
+            response.status(Status.NOT_FOUND_404).send();
+            return;
+        }
+        if (maybeAllResponse.isError()) {
             onErrorResult("Could not retrieve releases", response);
             return;
         }
