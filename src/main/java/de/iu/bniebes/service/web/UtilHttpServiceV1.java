@@ -56,16 +56,16 @@ public class UtilHttpServiceV1 implements HttpService {
 
     private void respondZuluEpochMicros(
             final ServerRequest request, final ServerResponse response, final Instant instant) {
-        final var micros = TimestampUtils.zuluEpochMicrosOf(instant);
-        if (acceptJson(request)) {
-            try {
-                response.header(HeaderNames.CONTENT_TYPE, MEDIA_TYPE_JSON)
-                        .send(mapper.writeValueAsString(new ZuluEpochMicrosResponse(micros.toString())));
-            } catch (JsonProcessingException e) {
-                response.status(Status.INTERNAL_SERVER_ERROR_500).send();
-            }
-        } else {
-            response.send(micros.toString());
+        final var micros = TimestampUtils.zuluEpochMicrosOf(instant).toString();
+        if (!acceptJson(request)) {
+            response.send(micros);
+            return;
+        }
+        try {
+            response.header(HeaderNames.CONTENT_TYPE, MEDIA_TYPE_JSON)
+                    .send(mapper.writeValueAsString(new ZuluEpochMicrosResponse(micros)));
+        } catch (JsonProcessingException e) {
+            response.status(Status.INTERNAL_SERVER_ERROR_500).send();
         }
     }
 
