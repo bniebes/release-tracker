@@ -28,7 +28,8 @@ public class Services implements AutoCloseable {
         this.releaseDBService = new ReleaseDBService(dbClientService.jdbi);
         this.releaseOptInfoDBService = new ReleaseOptInfoDBService(dbClientService.jdbi);
         this.inputSanitizationService = new InputSanitizationService();
-        this.releaseCreationService = new ReleaseCreationService(releaseDBService);
+        this.releaseCreationService =
+                new ReleaseCreationService(releaseDBService, releaseOptInfoDBService, inputSanitizationService);
         this.releaseAccessService = new ReleaseAccessService(releaseDBService, releaseOptInfoDBService);
     }
 

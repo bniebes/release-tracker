@@ -1,5 +1,6 @@
 package de.iu.bniebes.constant;
 
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -15,5 +16,10 @@ public class GlobalConstants {
 
     public static class Directories {
         public static final String SECRET = "/run/secrets";
+    }
+
+    public static class Timeouts {
+        public static final long VTX = 30;
+        public static final TimeUnit VTX_UNIT = TimeUnit.SECONDS;
     }
 }

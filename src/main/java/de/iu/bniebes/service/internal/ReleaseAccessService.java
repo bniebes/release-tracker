@@ -1,10 +1,10 @@
 package de.iu.bniebes.service.internal;
 
+import static de.iu.bniebes.constant.GlobalConstants.*;
 import static de.iu.bniebes.util.TimestampUtils.instantOf;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.iu.bniebes.constant.GlobalConstants;
 import de.iu.bniebes.model.db.FullRelease;
 import de.iu.bniebes.model.response.ReleaseResponse;
 import de.iu.bniebes.model.result.Result;
@@ -13,7 +13,6 @@ import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import java.math.BigInteger;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class ReleaseAccessService {
-
-    private static final long TIMEOUT = 30;
-    private static final TimeUnit TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
 
     private final ReleaseDBService releaseDBService;
     private final ReleaseOptInfoDBService releaseOptInfoDBService;
@@ -46,12 +42,10 @@ public class ReleaseAccessService {
             final var futureBuildLocation = vtx.submit(() -> releaseOptInfoDBService.buildLocationById(releaseId));
 
             vtx.shutdown();
-            if (!vtx.awaitTermination(TIMEOUT, TIMEOUT_TIME_UNIT)) {
+            if (!vtx.awaitTermination(Timeouts.VTX, Timeouts.VTX_UNIT)) {
                 log.atError()
-                        .addMarker(GlobalConstants.Markers.SERVICE)
-                        .setMessage("Timeout ({} {}) exceeded fetching optional release information")
-                        .addArgument(TIMEOUT)
-                        .addArgument(TIMEOUT_TIME_UNIT)
+                        .addMarker(Markers.SERVICE)
+                        .setMessage("Timeout exceeded fetching optional release information")
                         .log();
                 return Result.error();
             }
@@ -66,10 +60,7 @@ public class ReleaseAccessService {
 
             return Result.of(mapper.writeValueAsString(releaseResponse));
         } catch (InterruptedException | JsonProcessingException ex) {
-            log.atError()
-                    .addMarker(GlobalConstants.Markers.SERVICE)
-                    .setCause(ex)
-                    .log();
+            log.atError().addMarker(Markers.SERVICE).setCause(ex).log();
             return Result.error();
         }
     }
@@ -106,10 +97,7 @@ public class ReleaseAccessService {
                     fullReleases.stream().map(ReleaseResponse::of).collect(Collectors.toSet());
             return Result.of(mapper.writeValueAsString(releaseResponses));
         } catch (JsonProcessingException jpEx) {
-            log.atError()
-                    .addMarker(GlobalConstants.Markers.SERVICE)
-                    .setCause(jpEx)
-                    .log();
+            log.atError().addMarker(Markers.SERVICE).setCause(jpEx).log();
             return Result.error();
         }
     }

@@ -70,8 +70,12 @@ public class ReleaseOptInfoDBService {
     private boolean insertOptInfo(
             final BigInteger id, final String table, final String columnName, final String value) {
         try (final var handle = jdbi.open()) {
-            final var result = handle.createUpdate(
-                            "INSERT INTO %s(release_id, %s) VALUES (:release_id, :value);".formatted(table, columnName))
+            final var insertStatement =
+                    """
+                    INSERT INTO %s(release_id, %s) VALUES (:release_id, :value)
+                    ON CONFLICT (release_id) DO UPDATE SET %s = EXCLUDED.%s;
+                    """;
+            final var result = handle.createUpdate(insertStatement.formatted(table, columnName, columnName, columnName))
                     .bind("release_id", new BigDecimal(id))
                     .bind("value", value)
                     .execute();
