@@ -216,19 +216,73 @@ class ReleaseAccessServiceTest {
         }
     }
 
+    @Nested
+    public class CurrentByApplicationTests {
+
+        @Test
+        void currentByApplication() {
+            when(mockReleaseDBService.currentReleaseByApplication(TEST_APP)).thenReturn(Result.of(testFullRelease()));
+
+            final var result = releaseAccessService.currentByApplication(TEST_APP);
+            assertTrue(result.isPresent());
+        }
+
+        @Test
+        void currentByApplication_DBEmpty() {
+            when(mockReleaseDBService.currentReleaseByApplication(TEST_APP)).thenReturn(Result.error());
+
+            final var result = releaseAccessService.currentByApplication(TEST_APP);
+            assertTrue(result.isError());
+        }
+
+        @Test
+        void currentByApplication_DBError() {
+            when(mockReleaseDBService.currentReleaseByApplication(TEST_APP)).thenReturn(Result.error());
+
+            final var result = releaseAccessService.currentByApplication(TEST_APP);
+            assertTrue(result.isError());
+        }
+    }
+
+    @Nested
+    public class CurrentByApplicationAndEnvironmentTests {
+
+        @Test
+        void currentByApplicationAndEnvironment() {
+            when(mockReleaseDBService.currentReleaseByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.of(testFullRelease()));
+
+            final var result = releaseAccessService.currentByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isPresent());
+        }
+
+        @Test
+        void currentByApplicationAndEnvironment_DBEmpty() {
+            when(mockReleaseDBService.currentReleaseByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.error());
+
+            final var result = releaseAccessService.currentByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isError());
+        }
+
+        @Test
+        void currentByApplicationAndEnvironment_DBError() {
+            when(mockReleaseDBService.currentReleaseByApplicationAndEnvironment(TEST_APP, TEST_ENV))
+                    .thenReturn(Result.error());
+
+            final var result = releaseAccessService.currentByApplicationAndEnvironment(TEST_APP, TEST_ENV);
+            assertTrue(result.isError());
+        }
+    }
+
+    private static FullRelease testFullRelease() {
+        return new FullRelease(
+                BigInteger.ONE, TEST_APP, TEST_ENV, TEST_VER, Instant.now(), "test", "test", "test", "test", "test");
+    }
+
     private static Set<FullRelease> testFullReleases() {
         return Set.of(
-                new FullRelease(
-                        BigInteger.ONE,
-                        TEST_APP,
-                        TEST_ENV,
-                        TEST_VER,
-                        Instant.now(),
-                        "test",
-                        "test",
-                        "test",
-                        "test",
-                        "test"),
+                testFullRelease(),
                 new FullRelease(
                         BigInteger.TWO, TEST_APP, TEST_ENV, TEST_VER, Instant.now(), null, null, null, null, null));
     }
