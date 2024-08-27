@@ -1,7 +1,7 @@
 package de.iu.bniebes.service.web;
 
-import de.iu.bniebes.constant.GlobalConstants;
-import de.iu.bniebes.model.result.Result;
+import static de.iu.bniebes.util.ResponseUtil.*;
+
 import de.iu.bniebes.service.internal.InputSanitizationService;
 import de.iu.bniebes.service.internal.ReleaseAccessService;
 import de.iu.bniebes.service.internal.ReleaseCreationService;
@@ -156,31 +156,5 @@ public class ReleaseHttpServiceV1 implements HttpService {
             onNoSuchElementException(nseEx, response);
             return Optional.empty();
         }
-    }
-
-    private void onNoSuchElementException(final NoSuchElementException nseEx, final ServerResponse response) {
-        log.atError().addMarker(GlobalConstants.Markers.HTTP).setCause(nseEx).log();
-        response.status(Status.INTERNAL_SERVER_ERROR_500).send();
-    }
-
-    private void onErrorResult(final String message, final ServerResponse response) {
-        log.atError()
-                .addMarker(GlobalConstants.Markers.HTTP)
-                .setMessage(message)
-                .log();
-        response.status(Status.INTERNAL_SERVER_ERROR_500).send();
-    }
-
-    private void respondAccordingToResult(
-            final Result<String> result, final ServerResponse response, final String errorMsg) {
-        if (result.isEmpty()) {
-            response.status(Status.NOT_FOUND_404).send();
-            return;
-        }
-        if (result.isError()) {
-            onErrorResult(errorMsg, response);
-            return;
-        }
-        response.send(result.get());
     }
 }

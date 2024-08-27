@@ -90,12 +90,38 @@ public class ReleaseAccessService {
         return toJson(maybeFullReleases.get());
     }
 
+    public Result<String> currentByApplication(final String application) {
+        final var maybeFullRelease = releaseDBService.currentReleaseByApplication(application);
+        if (maybeFullRelease.isEmpty()) return Result.empty();
+        if (maybeFullRelease.isError()) return Result.error();
+
+        return toJson(maybeFullRelease.get());
+    }
+
+    public Result<String> currentByApplicationAndEnvironment(final String application, final String environment) {
+        final var maybeFullRelease =
+                releaseDBService.currentReleaseByApplicationAndEnvironment(application, environment);
+        if (maybeFullRelease.isEmpty()) return Result.empty();
+        if (maybeFullRelease.isError()) return Result.error();
+
+        return toJson(maybeFullRelease.get());
+    }
+
     private Result<String> toJson(final Set<FullRelease> fullReleases) {
         if (fullReleases.isEmpty()) return Result.empty();
         try {
             final var releaseResponses =
                     fullReleases.stream().map(ReleaseResponse::of).collect(Collectors.toSet());
             return Result.of(mapper.writeValueAsString(releaseResponses));
+        } catch (JsonProcessingException jpEx) {
+            log.atError().addMarker(Markers.SERVICE).setCause(jpEx).log();
+            return Result.error();
+        }
+    }
+
+    private Result<String> toJson(final FullRelease fullRelease) {
+        try {
+            return Result.of(mapper.writeValueAsString(ReleaseResponse.of(fullRelease)));
         } catch (JsonProcessingException jpEx) {
             log.atError().addMarker(Markers.SERVICE).setCause(jpEx).log();
             return Result.error();

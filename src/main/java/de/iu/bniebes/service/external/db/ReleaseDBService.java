@@ -237,6 +237,75 @@ public class ReleaseDBService {
         }
     }
 
+    public Result<FullRelease> currentReleaseByApplication(final String application) {
+        final var query =
+                """
+                SELECT
+                    id, application, environment, version, release_timestamp,
+                    rn.name, d.description, c.changes, r.responsibility, bl.build_location
+                FROM releases
+                         LEFT JOIN release_names rn on releases.id = rn.release_id
+                         LEFT JOIN descriptions d on releases.id = d.release_id
+                         LEFT JOIN changes c on releases.id = c.release_id
+                         LEFT JOIN responsibility r on c.release_id = r.release_id
+                         LEFT JOIN build_location bl on releases.id = bl.release_id
+                WHERE application = :app
+                ORDER BY release_timestamp DESC
+                LIMIT 1;
+                """;
+        try (final var handle = jdbi.open()) {
+            final var maybeFullRelease = handle.createQuery(query)
+                    .bind("app", application)
+                    .map(this::toFullRelease)
+                    .findOne();
+            return maybeFullRelease.map(Result::of).orElseGet(Result::empty);
+        } catch (Exception ex) {
+            log.atError()
+                    .addMarker(GlobalConstants.Markers.DB)
+                    .setMessage("Could not query current release by app[{}]")
+                    .addArgument(application)
+                    .setCause(ex)
+                    .log();
+            return Result.error();
+        }
+    }
+
+    public Result<FullRelease> currentReleaseByApplicationAndEnvironment(
+            final String application, final String environment) {
+        final var query =
+                """
+                SELECT
+                    id, application, environment, version, release_timestamp,
+                    rn.name, d.description, c.changes, r.responsibility, bl.build_location
+                FROM releases
+                         LEFT JOIN release_names rn on releases.id = rn.release_id
+                         LEFT JOIN descriptions d on releases.id = d.release_id
+                         LEFT JOIN changes c on releases.id = c.release_id
+                         LEFT JOIN responsibility r on c.release_id = r.release_id
+                         LEFT JOIN build_location bl on releases.id = bl.release_id
+                WHERE application = :app AND environment = :env
+                ORDER BY release_timestamp DESC
+                LIMIT 1;
+                """;
+        try (final var handle = jdbi.open()) {
+            final var maybeFullRelease = handle.createQuery(query)
+                    .bind("app", application)
+                    .bind("env", environment)
+                    .map(this::toFullRelease)
+                    .findOne();
+            return maybeFullRelease.map(Result::of).orElseGet(Result::empty);
+        } catch (Exception ex) {
+            log.atError()
+                    .addMarker(GlobalConstants.Markers.DB)
+                    .setMessage("Could not query current release by app[{}] and env[{}]")
+                    .addArgument(application)
+                    .addArgument(environment)
+                    .setCause(ex)
+                    .log();
+            return Result.error();
+        }
+    }
+
     private Map<String, ?> releaseBinds(
             final String application, final String environment, final String version, final Instant releaseTimestamp) {
         return Map.ofEntries(

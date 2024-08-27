@@ -33,6 +33,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
                 .routing(routing -> routing.get("/", (req, res) -> res.send("Release Tracker"))
                         .get("/health", (req, res) -> res.send("OK"))
                         .register("/v1/release", httpServices.releaseHttpServiceV1)
+                        .register("/v1/current", httpServices.currentHttpServiceV1)
                         .register("/v1/util", httpServices.utilHttpServiceV1))
                 .build()
                 .start();
