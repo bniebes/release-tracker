@@ -83,7 +83,7 @@ public class ReleaseCreationService {
             optionalInformation
                     .buildLocationOrEmpty()
                     .flatMap(inputSanitizationService::safeString)
-                    .map(bl -> vtx.submit(() -> releaseOptInfoDBService.insertResponsibility(id, bl)));
+                    .map(bl -> vtx.submit(() -> releaseOptInfoDBService.insertBuildLocation(id, bl)));
 
             vtx.shutdown();
             if (!vtx.awaitTermination(Timeouts.VTX, Timeouts.VTX_UNIT)) {
