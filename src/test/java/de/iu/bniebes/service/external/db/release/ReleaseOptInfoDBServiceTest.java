@@ -26,6 +26,9 @@ class ReleaseOptInfoDBServiceTest {
     private static final BigInteger TEST_ID = RELEASE_DB_SERVICE
             .insert(TEST_APP, TEST_ENV, TEST_VER, TEST_TIMESTAMP)
             .get();
+    private static final BigInteger TEST_ID_UPDATE = RELEASE_DB_SERVICE
+            .insert(TEST_APP, TEST_ENV, TEST_VER, Instant.now())
+            .get();
 
     private final ReleaseOptInfoDBService releaseOptInfoDBService = new ReleaseOptInfoDBService(JDBI);
 
@@ -48,6 +51,25 @@ class ReleaseOptInfoDBServiceTest {
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
         assertEquals(value, queryResult.get().name());
+    }
+
+    @Test
+    void updateReleaseName() {
+        final var value = "release-name-before-update";
+        final var updateValue = "release-name-after-update";
+
+        final var insertResult =
+                assertDoesNotThrow(() -> releaseOptInfoDBService.insertReleaseName(TEST_ID_UPDATE, value));
+        assertTrue(insertResult);
+
+        final var insertResultUpdate =
+                assertDoesNotThrow(() -> releaseOptInfoDBService.insertReleaseName(TEST_ID_UPDATE, updateValue));
+        assertTrue(insertResultUpdate);
+
+        final var queryResult = assertDoesNotThrow(() -> releaseOptInfoDBService.releaseNameById(TEST_ID_UPDATE));
+        assertTrue(queryResult.isPresent());
+        assertEquals(TEST_ID_UPDATE, queryResult.get().id());
+        assertEquals(updateValue, queryResult.get().name());
     }
 
     @Test
