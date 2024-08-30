@@ -13,11 +13,9 @@ import de.iu.bniebes.util.TimestampUtils;
 import java.math.BigInteger;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 class ReleaseOptInfoServiceTest {
 
     private static final String TEST_APP = "test-app";
