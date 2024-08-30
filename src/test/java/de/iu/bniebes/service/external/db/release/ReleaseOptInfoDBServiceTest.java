@@ -2,6 +2,7 @@ package de.iu.bniebes.service.external.db.release;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.iu.bniebes.model.OptInfo;
 import de.iu.bniebes.service.external.db.ReleaseDBService;
 import de.iu.bniebes.service.external.db.ReleaseOptInfoDBService;
 import de.iu.bniebes.service.external.db.helper.DBTestHelper;
@@ -130,5 +131,33 @@ class ReleaseOptInfoDBServiceTest {
         assertTrue(queryResult.isPresent());
         assertEquals(TEST_ID, queryResult.get().id());
         assertEquals(value, queryResult.get().name());
+    }
+
+    @Test
+    void stringValueById() {
+        final var testValue = "releaseName";
+        final var id = assertDoesNotThrow(() -> RELEASE_DB_SERVICE
+                .insert("stringValueById", TEST_ENV, TEST_VER, Instant.now())
+                .get());
+        assertTrue(releaseOptInfoDBService.insertReleaseName(id, testValue));
+
+        final var result = releaseOptInfoDBService.stringValueById(id, OptInfo.RELEASE_NAME);
+        assertTrue(result.isPresent());
+        assertEquals(testValue, result.get());
+    }
+
+    @Test
+    void deleteValueById() {
+        final var testValue = "releaseName";
+        final var id = assertDoesNotThrow(() -> RELEASE_DB_SERVICE
+                .insert("deleteValueById", TEST_ENV, TEST_VER, Instant.now())
+                .get());
+        assertTrue(releaseOptInfoDBService.insertReleaseName(id, testValue));
+        assertTrue(releaseOptInfoDBService.releaseNameById(id).isPresent());
+
+        final var result = releaseOptInfoDBService.deleteValueById(id, OptInfo.RELEASE_NAME);
+        assertTrue(result.isPresent());
+        assertTrue(result.get());
+        assertTrue(releaseOptInfoDBService.releaseNameById(id).isEmpty());
     }
 }
