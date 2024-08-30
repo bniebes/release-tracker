@@ -36,17 +36,8 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v4
-      - name: Install PostgreSQL client
-        run: |
-          apt-get update
-          apt-get install --yes postgresql-client
-      - name: Init PostgreSQL
-        env:
-          POSTGRES_USER: "release-tracker"
-          POSTGRES_DB: "release_tracker"
-          POSTGRES_PASSWORD: "dev"
-        run: |
-          pgsql -f local/mnt/init/db_init.sql
+      - name: Run init
+        run: psql -f local/mnt/init/db_init.sql postgresql://release-tracker:dev@localhost:5432/release_tracker
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
