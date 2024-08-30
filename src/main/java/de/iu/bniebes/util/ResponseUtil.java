@@ -30,14 +30,30 @@ public class ResponseUtil {
     public static void respondAccordingToResult(
             final Result<String> result, final ServerResponse response, final String errorMsg) {
         if (result.isEmpty()) {
-            response.status(Status.NOT_FOUND_404).send();
+            respondBadRequest(response);
             return;
         }
         if (result.isError()) {
             onErrorResult(errorMsg, response);
             return;
         }
+        respondJsonOK(result.get(), response);
+    }
+
+    public static void respondBadRequest(final ServerResponse response) {
+        response.status(Status.BAD_REQUEST_400).send();
+    }
+
+    public static void respondOK(final ServerResponse response) {
+        response.status(Status.OK_200).send();
+    }
+
+    public static void respondNotFound(final ServerResponse response) {
+        response.status(Status.NOT_FOUND_404).send();
+    }
+
+    public static void respondJsonOK(final String json, final ServerResponse response) {
         response.header(HeaderNames.CONTENT_TYPE, HeaderValues.CONTENT_TYPE_JSON.get())
-                .send(result.get());
+                .send(json);
     }
 }

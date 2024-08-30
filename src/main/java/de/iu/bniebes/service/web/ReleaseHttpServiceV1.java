@@ -2,6 +2,7 @@ package de.iu.bniebes.service.web;
 
 import static de.iu.bniebes.util.ResponseUtil.*;
 
+import de.iu.bniebes.model.parameter.AllParameters;
 import de.iu.bniebes.service.internal.InputSanitizationService;
 import de.iu.bniebes.service.internal.ReleaseAccessService;
 import de.iu.bniebes.service.internal.ReleaseCreationService;
@@ -12,9 +13,7 @@ import io.helidon.webserver.http.HttpRules;
 import io.helidon.webserver.http.HttpService;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
-import java.math.BigInteger;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ReleaseHttpServiceV1 implements HttpService {
 
     private static final String MEDIA_TYPE_JSON = HeaderValues.CONTENT_TYPE_JSON.values();
-
-    private record AllParameters(String app, String env, String ver, BigInteger zeu) {}
 
     private final InputSanitizationService inputSanitizationService;
     private final ReleaseCreationService releaseCreationService;
@@ -66,14 +63,14 @@ public class ReleaseHttpServiceV1 implements HttpService {
     }
 
     private void createOrUpdate(final ServerRequest request, final ServerResponse response) {
-        final var maybeParameters = allParameters(request, response);
+        final var maybeParameters = AllParameters.fromRequestResponding(inputSanitizationService, request, response);
         if (maybeParameters.isEmpty()) return;
         final var parameters = maybeParameters.get();
 
         final var optionalInfoJson = request.content().asOptional(String.class).orElse("");
 
         final var maybeCreateOrUpdateResult = releaseCreationService.createOrUpdate(
-                parameters.app, parameters.env, parameters.ver, parameters.zeu, optionalInfoJson);
+                parameters.app(), parameters.env(), parameters.ver(), parameters.zeu(), optionalInfoJson);
         if (maybeCreateOrUpdateResult.notPresent()) {
             response.status(Status.INTERNAL_SERVER_ERROR_500).send();
             return;
@@ -91,11 +88,12 @@ public class ReleaseHttpServiceV1 implements HttpService {
     }
 
     private void get(final ServerRequest request, final ServerResponse response) {
-        final var maybeParameters = allParameters(request, response);
+        final var maybeParameters = AllParameters.fromRequestResponding(inputSanitizationService, request, response);
         if (maybeParameters.isEmpty()) return;
         final var parameters = maybeParameters.get();
 
-        final var result = releaseAccessService.get(parameters.app, parameters.env, parameters.ver, parameters.zeu);
+        final var result =
+                releaseAccessService.get(parameters.app(), parameters.env(), parameters.ver(), parameters.zeu());
         respondAccordingToResult(result, response, "Could not get release");
     }
 
@@ -135,26 +133,6 @@ public class ReleaseHttpServiceV1 implements HttpService {
             respondAccordingToResult(result, response, "Could not retrieve releases");
         } catch (NoSuchElementException nseEx) {
             onNoSuchElementException(nseEx, response);
-        }
-    }
-
-    private Optional<AllParameters> allParameters(final ServerRequest request, final ServerResponse response) {
-        try {
-            final var parameters = request.path().pathParameters();
-            final var maybeApp = inputSanitizationService.safeString(parameters.get("app"));
-            final var maybeEnv = inputSanitizationService.safeString(parameters.get("env"));
-            final var maybeVer = inputSanitizationService.safeString(parameters.get("ver"));
-            final var maybeZet = inputSanitizationService.bigInteger(parameters.get("zeu"));
-
-            if (maybeApp.isEmpty() || maybeEnv.isEmpty() || maybeVer.isEmpty() || maybeZet.isEmpty()) {
-                response.status(Status.BAD_REQUEST_400).send();
-                return Optional.empty();
-            }
-
-            return Optional.of(new AllParameters(maybeApp.get(), maybeEnv.get(), maybeVer.get(), maybeZet.get()));
-        } catch (NoSuchElementException nseEx) {
-            onNoSuchElementException(nseEx, response);
-            return Optional.empty();
         }
     }
 }

@@ -1,6 +1,7 @@
 package de.iu.bniebes.service.external.db;
 
 import de.iu.bniebes.constant.GlobalConstants;
+import de.iu.bniebes.model.OptInfo;
 import de.iu.bniebes.model.db.*;
 import de.iu.bniebes.model.result.Result;
 import java.math.BigDecimal;
@@ -67,6 +68,26 @@ public class ReleaseOptInfoDBService {
         return queryByReleaseId(releaseId, TABLE_BUILD_LOCATION, COLUMN_BUILD_LOCATION, BuildLocation::new);
     }
 
+    public Result<String> stringValueById(final BigInteger releaseId, final OptInfo optInfo) {
+        return switch (optInfo) {
+            case RELEASE_NAME -> queryStringValueById(releaseId, TABLE_RELEASE_NAME, COLUMN_RELEASE_NAME);
+            case DESCRIPTION -> queryStringValueById(releaseId, TABLE_DESCRIPTION, COLUMN_DESCRIPTION);
+            case CHANGES -> queryStringValueById(releaseId, TABLE_CHANGES, COLUMN_CHANGES);
+            case RESPONSIBILITY -> queryStringValueById(releaseId, TABLE_RESPONSIBILITY, COLUMN_RESPONSIBILITY);
+            case BUILD_LOCATION -> queryStringValueById(releaseId, TABLE_BUILD_LOCATION, COLUMN_BUILD_LOCATION);
+        };
+    }
+
+    public Result<Boolean> deleteValueById(final BigInteger releaseId, final OptInfo optInfo) {
+        return switch (optInfo) {
+            case RELEASE_NAME -> deleteOptInfoById(releaseId, TABLE_RELEASE_NAME);
+            case DESCRIPTION -> deleteOptInfoById(releaseId, TABLE_DESCRIPTION);
+            case CHANGES -> deleteOptInfoById(releaseId, TABLE_CHANGES);
+            case RESPONSIBILITY -> deleteOptInfoById(releaseId, TABLE_RESPONSIBILITY);
+            case BUILD_LOCATION -> deleteOptInfoById(releaseId, TABLE_BUILD_LOCATION);
+        };
+    }
+
     private boolean insertOptInfo(
             final BigInteger id, final String table, final String columnName, final String value) {
         try (final var handle = jdbi.open()) {
@@ -105,12 +126,42 @@ public class ReleaseOptInfoDBService {
                     .map(Result::of)
                     .orElse(Result.empty());
         } catch (Exception ex) {
-            log.atError()
-                    .addMarker(GlobalConstants.Markers.DB)
-                    .setMessage("Could not query a release name by release id: {}")
-                    .addArgument(id)
-                    .log();
+            errorLog(id);
             return Result.error();
         }
+    }
+
+    private Result<String> queryStringValueById(final BigInteger id, final String table, final String columnName) {
+        try (final var handle = jdbi.open()) {
+            return handle.createQuery("SELECT * FROM %s WHERE release_id = :id;".formatted(table))
+                    .bind("id", new BigDecimal(id))
+                    .map((rs, ctx) -> rs.getString(columnName))
+                    .findOne()
+                    .map(Result::of)
+                    .orElse(Result.empty());
+        } catch (Exception ex) {
+            errorLog(id);
+            return Result.error();
+        }
+    }
+
+    private Result<Boolean> deleteOptInfoById(final BigInteger id, final String table) {
+        try (final var handle = jdbi.open()) {
+            final var deleteResult = handle.createUpdate("DELETE FROM %s WHERE release_id = :id;".formatted(table))
+                    .bind("id", new BigDecimal(id))
+                    .execute();
+            return deleteResult == 1 ? Result.of(Boolean.TRUE) : Result.empty();
+        } catch (Exception ex) {
+            errorLog(id);
+            return Result.error();
+        }
+    }
+
+    private void errorLog(final BigInteger id) {
+        log.atError()
+                .addMarker(GlobalConstants.Markers.DB)
+                .setMessage("Could not query a release name by release id: {}")
+                .addArgument(id)
+                .log();
     }
 }

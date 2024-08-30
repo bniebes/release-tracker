@@ -34,6 +34,7 @@ public class ReleaseTrackerApplication implements AutoCloseable {
                         .get("/health", (req, res) -> res.send("OK"))
                         .register("/v1/release", httpServices.releaseHttpServiceV1)
                         .register("/v1/current", httpServices.currentHttpServiceV1)
+                        .register("/v1/information", httpServices.releaseOptInfoHttpServiceV1)
                         .register("/v1/util", httpServices.utilHttpServiceV1))
                 .build()
                 .start();
