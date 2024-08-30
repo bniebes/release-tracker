@@ -1,0 +1,22 @@
+name: "release-tracker-workflow"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  testAndPackage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: 'maven'
+      - name: Maven Test
+        run: mvn clean test
+      - name: Maven Package
+        run: mvn clean package
