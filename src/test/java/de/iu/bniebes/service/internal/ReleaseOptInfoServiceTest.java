@@ -55,7 +55,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void optInfo_releaseNotFound() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.empty());
 
             final var result =
@@ -67,7 +67,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void optInfo_releaseDBError() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.error());
 
             final var result =
@@ -79,7 +79,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void optInfo_optInfoNotFound() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT, TEST_ID)));
             when(mockReleaseOptInfoDBService.stringValueById(TEST_ID, OptInfo.RELEASE_NAME))
                     .thenReturn(Result.empty());
@@ -91,7 +91,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void optInfo_optInfoDBError() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT, TEST_ID)));
             when(mockReleaseOptInfoDBService.stringValueById(TEST_ID, OptInfo.RELEASE_NAME))
                     .thenReturn(Result.error());
@@ -107,7 +107,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void deleteOptInfo() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT, TEST_ID)));
             when(mockReleaseOptInfoDBService.deleteValueById(TEST_ID, OptInfo.RELEASE_NAME))
                     .thenReturn(Result.of(true));
@@ -120,7 +120,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void deleteOptInfo_releaseNotFound() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.empty());
 
             final var result = assertDoesNotThrow(
@@ -131,7 +131,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void deleteOptInfo_releaseDBError() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.error());
 
             final var result = assertDoesNotThrow(
@@ -142,7 +142,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void deleteOptInfo_optInfoNotFound() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT, TEST_ID)));
             when(mockReleaseOptInfoDBService.deleteValueById(TEST_ID, OptInfo.RELEASE_NAME))
                     .thenReturn(Result.empty());
@@ -154,7 +154,7 @@ class ReleaseOptInfoServiceTest {
 
         @Test
         void deleteOptInfo_optInfoDBError() {
-            when(mockReleaseDBService.release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT))
+            when(mockReleaseDBService.release(eq(TEST_APP), eq(TEST_ENV), eq(TEST_VER), any()))
                     .thenReturn(Result.of(new Release(TEST_APP, TEST_ENV, TEST_VER, TEST_INSTANT, TEST_ID)));
             when(mockReleaseOptInfoDBService.deleteValueById(TEST_ID, OptInfo.RELEASE_NAME))
                     .thenReturn(Result.error());
